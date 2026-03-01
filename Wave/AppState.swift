@@ -33,6 +33,9 @@ final class AppState {
     var hotkeyModifiers: UInt64 {
         didSet { UserDefaults.standard.set(hotkeyModifiers, forKey: "hotkeyModifiers") }
     }
+    var includePunctuation: Bool {
+        didSet { UserDefaults.standard.set(includePunctuation, forKey: "includePunctuation") }
+    }
 
     // MARK: - Services
     let modelManager = ModelManager()
@@ -58,6 +61,11 @@ final class AppState {
         dictationMode = DictationMode(rawValue: UserDefaults.standard.string(forKey: "dictationMode") ?? "") ?? .pushToTalk
         hotkeyKeyCode = UInt16(UserDefaults.standard.integer(forKey: "hotkeyKeyCode"))
         hotkeyModifiers = UInt64(UserDefaults.standard.integer(forKey: "hotkeyModifiers"))
+        if UserDefaults.standard.object(forKey: "includePunctuation") == nil {
+            includePunctuation = true
+        } else {
+            includePunctuation = UserDefaults.standard.bool(forKey: "includePunctuation")
+        }
 
         // Default shortcut: Control + Space
         if hotkeyKeyCode == 0 && hotkeyModifiers == 0 {
@@ -135,7 +143,7 @@ final class AppState {
         status = .transcribing
         updateOverlay()
 
-        let text = await transcriptionService.stopRecordingAndTranscribe()
+        let text = await transcriptionService.stopRecordingAndTranscribe(includePunctuation: includePunctuation)
 
         hideOverlay()
 

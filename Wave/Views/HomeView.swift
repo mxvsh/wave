@@ -36,6 +36,13 @@ struct HomeView: View {
                 .onChange(of: appState.hotkeyModifiers) { appState.setupHotkey() }
             }
 
+            // Transcription section
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Transcription")
+                    .font(.headline)
+                Toggle("Include punctuation", isOn: $state.includePunctuation)
+            }
+
             // Model section
             VStack(alignment: .leading, spacing: 8) {
                 Text("Model")

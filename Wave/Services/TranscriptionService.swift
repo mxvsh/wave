@@ -34,7 +34,7 @@ final class TranscriptionService: NSObject, AVAudioRecorderDelegate {
         var errorDescription: String? { "Microphone access denied" }
     }
 
-    func stopRecordingAndTranscribe() async -> String? {
+    func stopRecordingAndTranscribe(includePunctuation: Bool) async -> String? {
         await recorder.stopRecording()
 
         guard let recordedFile = recordedFile else { return nil }
@@ -47,7 +47,7 @@ final class TranscriptionService: NSObject, AVAudioRecorderDelegate {
             await whisperContext.fullTranscribe(samples: samples)
             let text = await whisperContext.getTranscription()
             print("[wave] raw transcription: '\(text)'")
-            let cleaned = Self.clean(text)
+            let cleaned = Self.clean(text, includePunctuation: includePunctuation)
             print("[wave] cleaned: '\(cleaned ?? "nil — nothing to paste")'")
             return cleaned
         } catch {
@@ -63,13 +63,23 @@ final class TranscriptionService: NSObject, AVAudioRecorderDelegate {
         "(Music)", "(music)", "[noise]", "[NOISE]", "(noise)",
     ]
 
-    private static func clean(_ raw: String) -> String? {
+    private static func clean(_ raw: String, includePunctuation: Bool) -> String? {
         let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty || noiseTokens.contains(trimmed) { return nil }
         // Strip leading/trailing noise tokens that sometimes appear alongside real text
         var result = trimmed
         for token in noiseTokens {
             result = result.replacingOccurrences(of: token, with: "")
+        }
+        if !includePunctuation {
+            result = result
+                .components(separatedBy: .punctuationCharacters)
+                .joined(separator: " ")
+            result = result.replacingOccurrences(
+                of: "\\s+",
+                with: " ",
+                options: .regularExpression
+            )
         }
         result = result.trimmingCharacters(in: .whitespacesAndNewlines)
         return result.isEmpty ? nil : result
