@@ -10,7 +10,7 @@ Wave is a lightweight, native macOS dictation app focused on fast voice-to-text 
 
 ## Quick start
 
-Build it yourself for free from source, or get the ready-to-use app on [Gumroad](https://monawwar.gumroad.com/l/wave) with lifetime updates for just **$5.99**.
+Download the latest release from the [Releases page](https://github.com/monawwar/Wave/releases), or build from source yourself.
 
 ## Build from source
 

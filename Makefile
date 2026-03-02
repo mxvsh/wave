@@ -59,7 +59,8 @@ appcast: zip
 	"$(GENERATE_APPCAST)" "$(UPDATES_DIR)"
 
 release:
-	./scripts/release.sh
+	@echo "Releases are published automatically via GitHub Actions."
+	@echo "Commit with message: chore: release vX.Y.Z"
 
 clean:
 	rm -rf "$(DERIVED_DATA)"
