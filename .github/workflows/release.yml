@@ -2,36 +2,16 @@ name: Release
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-    outputs:
-      should_release: ${{ steps.check.outputs.should_release }}
-      version: ${{ steps.check.outputs.version }}
-    steps:
-      - name: Check commit message
-        id: check
-        run: |
-          MSG="${{ github.event.head_commit.message }}"
-          if echo "$MSG" | grep -qE '^chore: release v[0-9]+\.[0-9]+\.[0-9]+'; then
-            VERSION=$(echo "$MSG" | sed -E 's/^chore: release v([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
-            echo "should_release=true" >> "$GITHUB_OUTPUT"
-            echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          else
-            echo "should_release=false" >> "$GITHUB_OUTPUT"
-          fi
-
   build-and-release:
-    needs: check
-    if: needs.check.outputs.should_release == 'true'
     runs-on: macos-15
     permissions:
       contents: write
     env:
-      VERSION: ${{ needs.check.outputs.version }}
+      VERSION: ${{ github.ref_name }}
 
     steps:
       - name: Checkout
@@ -44,7 +24,7 @@ jobs:
 
       - name: Update version in project
         run: |
-          perl -0pi -e "s/MARKETING_VERSION = [^;]+;/MARKETING_VERSION = ${VERSION};/g" Wave.xcodeproj/project.pbxproj
+          perl -0pi -e "s/MARKETING_VERSION = [^;]+;/MARKETING_VERSION = ${VERSION#v};/g" Wave.xcodeproj/project.pbxproj
 
       - name: Build app
         run: |
@@ -59,7 +39,7 @@ jobs:
             build
 
       - name: Create DMG
-        run: make DMG_NAME="Wave-v${VERSION}" dmg
+        run: make DMG_NAME="Wave-${VERSION}" dmg
 
       - name: Create ZIP for Sparkle
         run: make zip
@@ -69,7 +49,7 @@ jobs:
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
           GENERATE_APPCAST="build/SourcePackages/artifacts/sparkle/Sparkle/bin/generate_appcast"
-          DOWNLOAD_PREFIX="https://github.com/${{ github.repository }}/releases/download/v${VERSION}"
+          DOWNLOAD_PREFIX="https://github.com/${{ github.repository }}/releases/download/${VERSION}"
           echo "$SPARKLE_PRIVATE_KEY" | "$GENERATE_APPCAST" \
             --ed-key-file - \
             --download-url-prefix "$DOWNLOAD_PREFIX" \
@@ -80,18 +60,18 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add updates/releases/appcast.xml
-          git commit -m "chore: update appcast for v${VERSION} [skip ci]"
-          git push
+          git commit -m "chore: update appcast for ${VERSION} [skip ci]"
+          git push origin HEAD:main
 
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          printf '## Wave v%s\n\nDownload `Wave-v%s.dmg`, open it, and drag Wave to your Applications folder.\n\n> **Note:** The app is ad-hoc signed. On first launch, right-click → Open to bypass Gatekeeper.\n\nAutomatic updates are delivered via the built-in updater.\n' \
+          printf '## Wave %s\n\nDownload `Wave-%s.dmg`, open it, and drag Wave to your Applications folder.\n\n> **Note:** The app is ad-hoc signed. On first launch, right-click → Open to bypass Gatekeeper.\n\nAutomatic updates are delivered via the built-in updater.\n' \
             "${VERSION}" "${VERSION}" > release_notes.md
-          gh release create "v${VERSION}" \
-            "Wave-v${VERSION}.dmg" \
+          gh release create "${VERSION}" \
+            "Wave-${VERSION}.dmg" \
             "updates/releases/Wave.zip" \
-            --title "Wave v${VERSION}" \
+            --title "Wave ${VERSION}" \
             --notes-file release_notes.md \
             --latest
