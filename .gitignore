@@ -70,3 +70,6 @@ fastlane/test_output
 
 # Large binaries
 models/
+
+# Node dependencies
+node_modules/
