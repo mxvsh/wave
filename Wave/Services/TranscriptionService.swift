@@ -34,7 +34,7 @@ final class TranscriptionService: NSObject, AVAudioRecorderDelegate {
         var errorDescription: String? { "Microphone access denied" }
     }
 
-    func stopRecordingAndTranscribe(includePunctuation: Bool) async -> String? {
+    func stopRecordingAndTranscribe(includePunctuation: Bool, initialPrompt: String? = nil) async -> String? {
         await recorder.stopRecording()
 
         guard let recordedFile = recordedFile else { return nil }
@@ -44,7 +44,7 @@ final class TranscriptionService: NSObject, AVAudioRecorderDelegate {
             let samples = try decodeWaveFile(recordedFile)
             let peak = samples.map { abs($0) }.max() ?? 0
             print("[wave] decoded \(samples.count) samples, peak amplitude: \(peak)")
-            await whisperContext.fullTranscribe(samples: samples)
+            await whisperContext.fullTranscribe(samples: samples, initialPrompt: initialPrompt)
             let text = await whisperContext.getTranscription()
             print("[wave] raw transcription: '\(text)'")
             let cleaned = Self.clean(text, includePunctuation: includePunctuation)

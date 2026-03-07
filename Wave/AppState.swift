@@ -36,6 +36,9 @@ final class AppState {
     var includePunctuation: Bool {
         didSet { UserDefaults.standard.set(includePunctuation, forKey: "includePunctuation") }
     }
+    var customVocabulary: [String] {
+        didSet { UserDefaults.standard.set(customVocabulary, forKey: "customVocabulary") }
+    }
 
     // MARK: - Services
     let modelManager = ModelManager()
@@ -66,6 +69,7 @@ final class AppState {
         } else {
             includePunctuation = UserDefaults.standard.bool(forKey: "includePunctuation")
         }
+        customVocabulary = UserDefaults.standard.stringArray(forKey: "customVocabulary") ?? []
 
         // Default shortcut: Control + Space
         if hotkeyKeyCode == 0 && hotkeyModifiers == 0 {
@@ -143,7 +147,8 @@ final class AppState {
         status = .transcribing
         updateOverlay()
 
-        let text = await transcriptionService.stopRecordingAndTranscribe(includePunctuation: includePunctuation)
+        let prompt = customVocabulary.isEmpty ? nil : customVocabulary.joined(separator: ", ")
+        let text = await transcriptionService.stopRecordingAndTranscribe(includePunctuation: includePunctuation, initialPrompt: prompt)
 
         hideOverlay()
 

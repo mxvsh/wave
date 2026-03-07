@@ -3,6 +3,7 @@ import SwiftUI
 struct HomeView: View {
     @Environment(AppState.self) private var appState
     @State private var showModelPicker = false
+    @State private var showDictionaryEditor = false
 
     var body: some View {
         @Bindable var state = appState
@@ -41,6 +42,22 @@ struct HomeView: View {
                 Text("Transcription")
                     .font(.headline)
                 Toggle("Include punctuation", isOn: $state.includePunctuation)
+            }
+
+            // Dictionary section
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Dictionary")
+                    .font(.headline)
+                HStack {
+                    let count = appState.customVocabulary.count
+                    Text(count == 0 ? "No terms" : "\(count) term\(count == 1 ? "" : "s")")
+                        .font(.system(size: 13))
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Manage...") { showDictionaryEditor = true }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                }
             }
 
             // Model section
@@ -88,6 +105,11 @@ struct HomeView: View {
                 .environment(appState)
                 .frame(width: 420, height: 420)
         }
+        .sheet(isPresented: $showDictionaryEditor) {
+            DictionaryEditorView()
+                .environment(appState)
+                .frame(width: 360, height: 300)
+        }
         .sheet(isPresented: Binding(
             get: { appState.showOnboarding },
             set: { appState.showOnboarding = $0 }
@@ -114,4 +136,5 @@ struct HomeView: View {
         case .error(let msg): return msg
         }
     }
+
 }
