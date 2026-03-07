@@ -3,7 +3,7 @@ import SwiftUI
 struct HomeView: View {
     @Environment(AppState.self) private var appState
     @State private var showModelPicker = false
-    @State private var newVocabTerm = ""
+    @State private var showDictionaryEditor = false
 
     var body: some View {
         @Bindable var state = appState
@@ -44,47 +44,25 @@ struct HomeView: View {
                 Toggle("Include punctuation", isOn: $state.includePunctuation)
             }
 
-            // Vocabulary section
+            // Dictionary section
             VStack(alignment: .leading, spacing: 8) {
-                Text("Vocabulary")
-                    .font(.headline)
-                Text("Terms listed here are hinted to the model before each transcription, improving accuracy for technical names and jargon.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                if !appState.customVocabulary.isEmpty {
-                    ScrollView {
-                        VStack(spacing: 4) {
-                            ForEach(appState.customVocabulary, id: \.self) { term in
-                                HStack {
-                                    Text(term)
-                                        .font(.system(size: 13))
-                                    Spacer()
-                                    Button {
-                                        appState.customVocabulary.removeAll { $0 == term }
-                                    } label: {
-                                        Image(systemName: "minus.circle.fill")
-                                            .foregroundStyle(.secondary)
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 5)
-                                .background(Color(.controlBackgroundColor))
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                            }
-                        }
-                    }
-                    .frame(maxHeight: 120)
+                HStack(spacing: 6) {
+                    Text("Dictionary")
+                        .font(.headline)
+                    Image(systemName: "info.circle")
+                        .font(.system(size: 13))
+                        .foregroundStyle(.secondary)
+                        .help("Terms listed here are hinted to the model before each transcription, improving accuracy for technical names, library names, and jargon.")
                 }
-
                 HStack {
-                    TextField("Add term…", text: $newVocabTerm)
-                        .textFieldStyle(.roundedBorder)
-                        .onSubmit { addVocabTerm() }
-                    Button("Add") { addVocabTerm() }
-                        .disabled(newVocabTerm.trimmingCharacters(in: .whitespaces).isEmpty)
+                    let count = appState.customVocabulary.count
+                    Text(count == 0 ? "No terms" : "\(count) term\(count == 1 ? "" : "s")")
+                        .font(.system(size: 13))
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Manage...") { showDictionaryEditor = true }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
                 }
             }
 
@@ -133,6 +111,11 @@ struct HomeView: View {
                 .environment(appState)
                 .frame(width: 420, height: 420)
         }
+        .sheet(isPresented: $showDictionaryEditor) {
+            DictionaryEditorView()
+                .environment(appState)
+                .frame(width: 360, height: 300)
+        }
         .sheet(isPresented: Binding(
             get: { appState.showOnboarding },
             set: { appState.showOnboarding = $0 }
@@ -160,10 +143,4 @@ struct HomeView: View {
         }
     }
 
-    private func addVocabTerm() {
-        let term = newVocabTerm.trimmingCharacters(in: .whitespaces)
-        guard !term.isEmpty, !appState.customVocabulary.contains(term) else { return }
-        appState.customVocabulary.append(term)
-        newVocabTerm = ""
-    }
 }
