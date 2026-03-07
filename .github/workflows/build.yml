@@ -12,6 +12,11 @@ jobs:
   build:
     runs-on: macos-latest
 
+    outputs:
+      marketing_version: ${{ steps.version.outputs.marketing_version }}
+      tag: ${{ steps.version.outputs.tag }}
+      is_release: ${{ steps.version.outputs.is_release }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,6 +31,7 @@ jobs:
             echo "is_release=true" >> $GITHUB_OUTPUT
           else
             SHORT_SHA="${GITHUB_SHA:0:7}"
+            echo "tag=dev-${SHORT_SHA}" >> $GITHUB_OUTPUT
             echo "marketing_version=$SHORT_SHA" >> $GITHUB_OUTPUT
             echo "is_release=false" >> $GITHUB_OUTPUT
           fi
@@ -41,49 +47,36 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO
 
-      # main push — create DMG and pre-release
-      - name: Install create-dmg (pre-release)
-        if: steps.version.outputs.is_release == 'false'
-        run: brew install create-dmg
+      - name: Upload app
+        uses: actions/upload-artifact@v4
+        with:
+          name: Wave.app
+          path: build/Build/Products/Release/Wave.app
 
-      - name: Create DMG (pre-release)
-        if: steps.version.outputs.is_release == 'false'
-        run: |
-          mkdir -p dmg-staging
-          cp -R build/Build/Products/Release/Wave.app dmg-staging/
-          create-dmg \
-            --volname "Wave" \
-            --window-pos 200 120 \
-            --window-size 640 360 \
-            --icon-size 96 \
-            --icon "Wave.app" 180 170 \
-            --hide-extension "Wave.app" \
-            --app-drop-link 460 170 \
-            "Wave-Installer-${{ steps.version.outputs.marketing_version }}.dmg" \
-            dmg-staging/
+  package:
+    runs-on: macos-latest
+    needs: build
 
-      - name: Create pre-release
-        if: steps.version.outputs.is_release == 'false'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          SHORT_SHA="${{ steps.version.outputs.marketing_version }}"
-          gh release create "dev-${SHORT_SHA}" \
-            --title "dev-${SHORT_SHA}" \
-            --prerelease \
-            --notes "Development build from commit ${GITHUB_SHA}" \
-            "Wave-Installer-${SHORT_SHA}.dmg"
+    outputs:
+      dmg_name: ${{ steps.dmg.outputs.dmg_name }}
 
-      # tag release steps below
+    steps:
+      - name: Download app
+        uses: actions/download-artifact@v4
+        with:
+          name: Wave.app
+          path: Wave.app
+
       - name: Install create-dmg
-        if: steps.version.outputs.is_release == 'true'
         run: brew install create-dmg
 
       - name: Create DMG
-        if: steps.version.outputs.is_release == 'true'
+        id: dmg
         run: |
-          mkdir -p dmg-staging
-          cp -R build/Build/Products/Release/Wave.app dmg-staging/
+          TAG="${{ needs.build.outputs.tag }}"
+          DMG_NAME="Wave-Installer-${TAG}.dmg"
+          echo "dmg_name=$DMG_NAME" >> $GITHUB_OUTPUT
+
           create-dmg \
             --volname "Wave" \
             --window-pos 200 120 \
@@ -92,11 +85,30 @@ jobs:
             --icon "Wave.app" 180 170 \
             --hide-extension "Wave.app" \
             --app-drop-link 460 170 \
-            "Wave-Installer-${{ steps.version.outputs.tag }}.dmg" \
-            dmg-staging/
+            "$DMG_NAME" \
+            Wave.app/
+
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.dmg.outputs.dmg_name }}
+          path: ${{ steps.dmg.outputs.dmg_name }}
+
+  release:
+    runs-on: macos-latest
+    needs: [build, package]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download DMG
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.package.outputs.dmg_name }}
 
       - name: Install Sparkle tools
-        if: steps.version.outputs.is_release == 'true'
+        if: needs.build.outputs.is_release == 'true'
         run: |
           curl -L https://github.com/sparkle-project/Sparkle/releases/download/2.7.5/Sparkle-2.7.5.tar.xz -o sparkle.tar.xz
           mkdir sparkle-tools
@@ -105,12 +117,12 @@ jobs:
           echo "$SPARKLE_BIN" >> $GITHUB_PATH
 
       - name: Generate appcast
-        if: steps.version.outputs.is_release == 'true'
+        if: needs.build.outputs.is_release == 'true'
         env:
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
-          TAG="${{ steps.version.outputs.tag }}"
-          DMG="Wave-Installer-${TAG}.dmg"
+          TAG="${{ needs.build.outputs.tag }}"
+          DMG="${{ needs.package.outputs.dmg_name }}"
 
           mkdir release-dir
           cp "$DMG" release-dir/
@@ -124,18 +136,28 @@ jobs:
           rm /tmp/sparkle.key
 
       - name: Create GitHub Release
-        if: steps.version.outputs.is_release == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="${{ steps.version.outputs.tag }}"
-          gh release create "$TAG" \
-            --title "$TAG" \
-            --generate-notes \
-            "Wave-Installer-${TAG}.dmg"
+          TAG="${{ needs.build.outputs.tag }}"
+          DMG="${{ needs.package.outputs.dmg_name }}"
+          IS_RELEASE="${{ needs.build.outputs.is_release }}"
+
+          if [[ "$IS_RELEASE" == "true" ]]; then
+            gh release create "$TAG" \
+              --title "$TAG" \
+              --generate-notes \
+              "$DMG"
+          else
+            gh release create "$TAG" \
+              --title "$TAG" \
+              --prerelease \
+              --notes "Development build from commit ${GITHUB_SHA}" \
+              "$DMG"
+          fi
 
       - name: Push appcast to gh-pages
-        if: steps.version.outputs.is_release == 'true'
+        if: needs.build.outputs.is_release == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -143,5 +165,5 @@ jobs:
           git checkout gh-pages
           cp release-dir/appcast.xml appcast.xml
           git add appcast.xml
-          git commit -m "Update appcast for ${{ steps.version.outputs.tag }}"
+          git commit -m "Update appcast for ${{ needs.build.outputs.tag }}"
           git push origin gh-pages
