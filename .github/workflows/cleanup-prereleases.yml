@@ -1,0 +1,24 @@
+name: Cleanup Pre-releases
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # every Sunday at midnight UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Delete old pre-releases
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Keep the 3 most recent pre-releases, delete the rest
+          gh release list --repo mxvsh/wave --limit 100 --json tagName,isPrerelease \
+            | jq -r '.[] | select(.isPrerelease == true) | .tagName' \
+            | tail -n +4 \
+            | xargs -I {} gh release delete {} --repo mxvsh/wave --yes --cleanup-tag

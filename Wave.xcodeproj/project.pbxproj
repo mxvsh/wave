@@ -291,10 +291,10 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = wave/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Wave;
 				INFOPLIST_KEY_CFBundleName = Wave;
 				INFOPLIST_KEY_LSUIElement = NO;
-				INFOPLIST_FILE = wave/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Wave needs microphone access to record speech for transcription.";
 				INFOPLIST_KEY_SUAutomaticallyUpdate = YES;
@@ -334,10 +334,10 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = wave/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Wave;
 				INFOPLIST_KEY_CFBundleName = Wave;
 				INFOPLIST_KEY_LSUIElement = NO;
-				INFOPLIST_FILE = wave/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Wave needs microphone access to record speech for transcription.";
 				INFOPLIST_KEY_SUAutomaticallyUpdate = YES;
