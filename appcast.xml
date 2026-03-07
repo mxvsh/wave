@@ -1,8 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
         <title>Wave</title>
-        <link>https://mxvsh.github.io/wave/appcast.xml</link>
-        <language>en</language>
+        <item>
+            <title>0.2.2</title>
+            <pubDate>Sat, 07 Mar 2026 17:29:44 +0000</pubDate>
+            <link>https://github.com/mxvsh/wave</link>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>0.2.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.1</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/mxvsh/wave/releases/download/v0.2.2/Wave-Installer-v0.2.2.dmg" length="8248160" type="application/octet-stream" sparkle:edSignature="Emm2xtZ+IsvLNkBdhKtEVfRfAi/N1CvF8NBVMFqS0Pz37pT+Nbb07ktMy4/yHak4GwHzOa2ppudWqhlR8Mz/Dg=="/>
+        </item>
     </channel>
 </rss>
