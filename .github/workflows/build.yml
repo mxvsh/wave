@@ -146,9 +146,11 @@ jobs:
           IS_RELEASE="${{ needs.build.outputs.is_release }}"
 
           if [[ "$IS_RELEASE" == "true" ]]; then
+            VERSION="${{ needs.build.outputs.marketing_version }}"
+            awk "/^## \[${VERSION}\]/{found=1; next} found && /^## /{exit} found{print}" CHANGELOG.md > release-notes.md
             gh release create "$TAG" \
               --title "$TAG" \
-              --generate-notes \
+              --notes-file release-notes.md \
               "release-dir/$DMG"
           else
             gh release create "$TAG" \
