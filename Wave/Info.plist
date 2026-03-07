@@ -29,8 +29,8 @@
     <key>SUEnableAutomaticChecks</key>
     <true/>
     <key>SUFeedURL</key>
-    <string>https://cdn.monawwar.io/wave/paid/appcast.xml</string>
+    <string>https://mxvsh.github.io/wave/appcast.xml</string>
     <key>SUPublicEDKey</key>
-    <string>q/IKtcptxzOnPkRIfmwXYt9vUFnqqHa363M2H3VoZ20=</string>
+    <string>vSosedCFbTsupLpgJQjtwDHC2QAUD4Q87qpeQ0caRTA=</string>
 </dict>
 </plist>

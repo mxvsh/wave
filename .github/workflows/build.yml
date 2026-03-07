@@ -1,0 +1,147 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set version
+        id: version
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+            echo "tag=$TAG" >> $GITHUB_OUTPUT
+            echo "marketing_version=${TAG#v}" >> $GITHUB_OUTPUT
+            echo "is_release=true" >> $GITHUB_OUTPUT
+          else
+            SHORT_SHA="${GITHUB_SHA:0:7}"
+            echo "marketing_version=$SHORT_SHA" >> $GITHUB_OUTPUT
+            echo "is_release=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build
+        run: |
+          xcodebuild \
+            -project Wave.xcodeproj \
+            -scheme Wave \
+            -configuration Release \
+            -derivedDataPath build \
+            MARKETING_VERSION="${{ steps.version.outputs.marketing_version }}" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
+
+      # main push — create DMG and pre-release
+      - name: Install create-dmg (pre-release)
+        if: steps.version.outputs.is_release == 'false'
+        run: brew install create-dmg
+
+      - name: Create DMG (pre-release)
+        if: steps.version.outputs.is_release == 'false'
+        run: |
+          mkdir -p dmg-staging
+          cp -R build/Build/Products/Release/Wave.app dmg-staging/
+          create-dmg \
+            --volname "Wave" \
+            --window-pos 200 120 \
+            --window-size 640 360 \
+            --icon-size 96 \
+            --icon "Wave.app" 180 170 \
+            --hide-extension "Wave.app" \
+            --app-drop-link 460 170 \
+            "Wave-Installer-${{ steps.version.outputs.marketing_version }}.dmg" \
+            dmg-staging/
+
+      - name: Create pre-release
+        if: steps.version.outputs.is_release == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SHORT_SHA="${{ steps.version.outputs.marketing_version }}"
+          gh release create "dev-${SHORT_SHA}" \
+            --title "dev-${SHORT_SHA}" \
+            --prerelease \
+            --notes "Development build from commit ${GITHUB_SHA}" \
+            "Wave-Installer-${SHORT_SHA}.dmg"
+
+      # tag release steps below
+      - name: Install create-dmg
+        if: steps.version.outputs.is_release == 'true'
+        run: brew install create-dmg
+
+      - name: Create DMG
+        if: steps.version.outputs.is_release == 'true'
+        run: |
+          mkdir -p dmg-staging
+          cp -R build/Build/Products/Release/Wave.app dmg-staging/
+          create-dmg \
+            --volname "Wave" \
+            --window-pos 200 120 \
+            --window-size 640 360 \
+            --icon-size 96 \
+            --icon "Wave.app" 180 170 \
+            --hide-extension "Wave.app" \
+            --app-drop-link 460 170 \
+            "Wave-Installer-${{ steps.version.outputs.tag }}.dmg" \
+            dmg-staging/
+
+      - name: Install Sparkle tools
+        if: steps.version.outputs.is_release == 'true'
+        run: |
+          curl -L https://github.com/sparkle-project/Sparkle/releases/download/2.7.5/Sparkle-2.7.5.tar.xz -o sparkle.tar.xz
+          mkdir sparkle-tools
+          tar -xf sparkle.tar.xz -C sparkle-tools
+          SPARKLE_BIN=$(find sparkle-tools -name generate_appcast -type f | head -1 | xargs dirname)
+          echo "$SPARKLE_BIN" >> $GITHUB_PATH
+
+      - name: Generate appcast
+        if: steps.version.outputs.is_release == 'true'
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          DMG="Wave-Installer-${TAG}.dmg"
+
+          mkdir release-dir
+          cp "$DMG" release-dir/
+
+          echo "$SPARKLE_PRIVATE_KEY" > /tmp/sparkle.key
+          generate_appcast \
+            --ed-key-file /tmp/sparkle.key \
+            --download-url-prefix "https://github.com/mxvsh/wave/releases/download/${TAG}/" \
+            --link "https://github.com/mxvsh/wave" \
+            release-dir/
+          rm /tmp/sparkle.key
+
+      - name: Create GitHub Release
+        if: steps.version.outputs.is_release == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --generate-notes \
+            "Wave-Installer-${TAG}.dmg"
+
+      - name: Push appcast to gh-pages
+        if: steps.version.outputs.is_release == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages
+          git checkout gh-pages
+          cp release-dir/appcast.xml appcast.xml
+          git add appcast.xml
+          git commit -m "Update appcast for ${{ steps.version.outputs.tag }}"
+          git push origin gh-pages
