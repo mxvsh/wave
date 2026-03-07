@@ -7,5 +7,6 @@
   "devDependencies": {
     "@release-it/conventional-changelog": "^10.0.5",
     "release-it": "^19.2.4"
-  }
+  },
+  "version": "0.2.1"
 }

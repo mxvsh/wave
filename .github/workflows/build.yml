@@ -110,7 +110,7 @@ jobs:
       - name: Install Sparkle tools
         if: needs.build.outputs.is_release == 'true'
         run: |
-          curl -L https://github.com/sparkle-project/Sparkle/releases/download/2.7.5/Sparkle-2.7.5.tar.xz -o sparkle.tar.xz
+          curl -L https://github.com/sparkle-project/Sparkle/releases/download/2.9.0/Sparkle-2.9.0.tar.xz -o sparkle.tar.xz
           mkdir sparkle-tools
           tar -xf sparkle.tar.xz -C sparkle-tools
           SPARKLE_BIN=$(find sparkle-tools -name generate_appcast -type f | head -1 | xargs dirname)
