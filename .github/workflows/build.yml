@@ -1,8 +1,8 @@
 name: Build & Release
 
 on:
+  workflow_dispatch:
   push:
-    branches: [main]
     tags: ['v*.*.*']
 
 permissions:
@@ -11,7 +11,6 @@ permissions:
 jobs:
   build:
     runs-on: macos-latest
-    if: "!startsWith(github.event.head_commit.message, 'chore: release')"
 
     outputs:
       marketing_version: ${{ steps.version.outputs.marketing_version }}
