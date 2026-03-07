@@ -107,6 +107,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ needs.package.outputs.dmg_name }}
+          path: release-dir
 
       - name: Install Sparkle tools
         if: needs.build.outputs.is_release == 'true'
@@ -125,10 +126,8 @@ jobs:
           TAG="${{ needs.build.outputs.tag }}"
           DMG="${{ needs.package.outputs.dmg_name }}"
 
-          mkdir release-dir
-          cp "$DMG" release-dir/
-
           echo "$SPARKLE_PRIVATE_KEY" > /tmp/sparkle.key
+
           generate_appcast \
             --ed-key-file /tmp/sparkle.key \
             --download-url-prefix "https://github.com/mxvsh/wave/releases/download/${TAG}/" \
@@ -148,13 +147,13 @@ jobs:
             gh release create "$TAG" \
               --title "$TAG" \
               --generate-notes \
-              "$DMG"
+              "release-dir/$DMG"
           else
             gh release create "$TAG" \
               --title "$TAG" \
               --prerelease \
               --notes "Development build from commit ${GITHUB_SHA}" \
-              "$DMG"
+              "release-dir/$DMG"
           fi
 
       - name: Push appcast to gh-pages
