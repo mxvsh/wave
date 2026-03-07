@@ -36,6 +36,9 @@ final class AppState {
     var includePunctuation: Bool {
         didSet { UserDefaults.standard.set(includePunctuation, forKey: "includePunctuation") }
     }
+    var muteSystemAudio: Bool {
+        didSet { UserDefaults.standard.set(muteSystemAudio, forKey: "muteSystemAudio") }
+    }
 
     // MARK: - Services
     let modelManager = ModelManager()
@@ -66,6 +69,7 @@ final class AppState {
         } else {
             includePunctuation = UserDefaults.standard.bool(forKey: "includePunctuation")
         }
+        muteSystemAudio = UserDefaults.standard.bool(forKey: "muteSystemAudio")
 
         // Default shortcut: Control + Space
         if hotkeyKeyCode == 0 && hotkeyModifiers == 0 {
@@ -130,8 +134,10 @@ final class AppState {
         do {
             status = .recording
             showOverlay()
+            if muteSystemAudio { SystemAudioDucker.duck() }
             try await transcriptionService.startRecording()
         } catch {
+            if muteSystemAudio { SystemAudioDucker.restore() }
             status = .error("Recording failed")
             hideOverlay()
             try? await Task.sleep(for: .seconds(2))
@@ -144,6 +150,7 @@ final class AppState {
         updateOverlay()
 
         let text = await transcriptionService.stopRecordingAndTranscribe(includePunctuation: includePunctuation)
+        if muteSystemAudio { SystemAudioDucker.restore() }
 
         hideOverlay()
 

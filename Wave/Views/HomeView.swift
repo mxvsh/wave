@@ -41,6 +41,7 @@ struct HomeView: View {
                 Text("Transcription")
                     .font(.headline)
                 Toggle("Include punctuation", isOn: $state.includePunctuation)
+                Toggle("Mute system audio while dictating", isOn: $state.muteSystemAudio)
             }
 
             // Model section
