@@ -47,6 +47,9 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO
 
+      - name: Ad-hoc sign
+        run: codesign --force --deep --sign - build/Build/Products/Release/Wave.app
+
       - name: Upload app
         uses: actions/upload-artifact@v4
         with:
