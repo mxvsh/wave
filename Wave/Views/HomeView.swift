@@ -46,14 +46,8 @@ struct HomeView: View {
 
             // Dictionary section
             VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 6) {
-                    Text("Dictionary")
-                        .font(.headline)
-                    Image(systemName: "info.circle")
-                        .font(.system(size: 13))
-                        .foregroundStyle(.secondary)
-                        .help("Terms listed here are hinted to the model before each transcription, improving accuracy for technical names, library names, and jargon.")
-                }
+                Text("Dictionary")
+                    .font(.headline)
                 HStack {
                     let count = appState.customVocabulary.count
                     Text(count == 0 ? "No terms" : "\(count) term\(count == 1 ? "" : "s")")
