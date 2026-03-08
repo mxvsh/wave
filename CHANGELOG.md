@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.5](https://github.com/mxvsh/wave/compare/v0.2.4...v0.2.5) (2026-03-08)
+
+### Bug Fixes
+
+* **ci:** use macos-26 ([7870581](https://github.com/mxvsh/wave/commit/7870581827950dc4f398f9d554bab35e652da308))
+
 ## [0.2.4](https://github.com/mxvsh/wave/compare/v0.2.3...v0.2.4) (2026-03-08)
 
 ### Bug Fixes
