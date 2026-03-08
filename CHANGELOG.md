@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.8](https://github.com/mxvsh/wave/compare/v0.2.7...v0.2.8) (2026-03-08)
+
+### Bug Fixes
+
+* bump CFBundleVersion alongside marketing version on release ([d2fa1d9](https://github.com/mxvsh/wave/commit/d2fa1d901ddc7a4ccd6ec2120306fe047a6f729e))
+* include Info.plist in release version bump hook ([a725bf5](https://github.com/mxvsh/wave/commit/a725bf5032a949ba0e60b164fb463d7b08d7e113))
+* resolve menu bar window, onboarding mic stuck, and debug bundle ID ([93a0f23](https://github.com/mxvsh/wave/commit/93a0f23e0f90ce525fa4062123887778f62fc51e))
+
 ## [0.2.7](https://github.com/mxvsh/wave/compare/v0.2.6...v0.2.7) (2026-03-08)
 
 ### Bug Fixes
