@@ -14,14 +14,6 @@
     "@release-it/conventional-changelog": {
       "preset": "conventionalcommits",
       "infile": "CHANGELOG.md"
-    },
-    "@release-it/bumper": {
-			"out": [
-				{
-					"file": "Wave/Info.plist",
-					"type": "text/plain"
-				}
-			]
-		}
+    }
   }
 }
