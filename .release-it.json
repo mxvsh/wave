@@ -11,9 +11,14 @@
     "@release-it/conventional-changelog": {
       "preset": "conventionalcommits",
       "infile": "CHANGELOG.md"
-    }
-  },
-  "hooks": {
-    "before:git:release": "xcrun agvtool new-marketing-version ${version} && git add Wave.xcodeproj/project.pbxproj CHANGELOG.md"
+    },
+    "@release-it/bumper": {
+			"out": [
+				{
+					"file": "Wave/Info.plist",
+					"type": "text/plain"
+				}
+			]
+		}
   }
 }
