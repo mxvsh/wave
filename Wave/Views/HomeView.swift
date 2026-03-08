@@ -31,7 +31,14 @@ struct HomeView: View {
                     .font(.headline)
                 ShortcutRecorderView(
                     keyCode: $state.hotkeyKeyCode,
-                    modifiers: $state.hotkeyModifiers
+                    modifiers: $state.hotkeyModifiers,
+                    onRecordingChanged: { isRecording in
+                        if isRecording {
+                            appState.hotkeyService.stop()
+                        } else {
+                            appState.hotkeyService.start()
+                        }
+                    }
                 )
                 .onChange(of: appState.hotkeyKeyCode) { appState.setupHotkey() }
                 .onChange(of: appState.hotkeyModifiers) { appState.setupHotkey() }
