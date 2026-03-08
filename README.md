@@ -43,7 +43,8 @@ Or launch from Xcode:
 
 - [x] Toggle-style recording mode from settings
 - [x] Local/offline transcription with Whisper models
-- [ ] Add optional text cleanup modes (punctuation, capitalization, concise cleanup)
+- [x] Add optional text cleanup modes (punctuation, capitalization, concise cleanup)
+- [x] Add support for custom dictionary words
 - [ ] Add app-specific behavior profiles (different formatting for IDE/chat/docs)
 - [ ] Add recent dictation history with one-click reinsert/copy
 - [ ] Add quality presets for speed vs accuracy
