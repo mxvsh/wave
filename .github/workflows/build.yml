@@ -155,11 +155,13 @@ jobs:
             awk "/^## \[${VERSION}\]/{found=1; next} found && /^## /{exit} found{print}" CHANGELOG.md > release-notes.md
             gh release create "$TAG" \
               --title "$TAG" \
+              --target "$GITHUB_SHA" \
               --notes-file release-notes.md \
               "release-dir/$DMG"
           else
             gh release create "$TAG" \
               --title "$TAG" \
+              --target "$GITHUB_SHA" \
               --prerelease \
               --notes "Development build from commit ${GITHUB_SHA}" \
               "release-dir/$DMG"
