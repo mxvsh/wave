@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.7](https://github.com/mxvsh/wave/compare/v0.2.6...v0.2.7) (2026-03-08)
+
+### Bug Fixes
+
+* `Combine` import ([8b1cc99](https://github.com/mxvsh/wave/commit/8b1cc99f6437548242c1e40f9cd82a9678af6d60))
+
 * docs: update contributing.md (b20c303)
 * chore: separate debug package (b9abeac)
 * feat: add live permission gating section to settings (9c9d9f5)
