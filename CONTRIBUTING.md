@@ -6,31 +6,11 @@ This project is maintained as a personal-use native macOS app. Contributions sho
 
 ## Local Setup
 
-1. Open `Wave.xcodeproj` in Xcode.
-2. Select scheme `Wave`.
-3. Build locally:
+1. Open `Wave.xcodeproj` in Xcode
+2. Select scheme `Wave`
+3. Press **Run** — this builds the Debug configuration, which installs as **Wave (Debug)** and uses bundle ID `io.monawwar.wave.debug`
 
-```bash
-make build
-```
-
-If needed, rebuild from scratch:
-
-```bash
-make clean && make build
-```
-
-You can run the app from:
-- Xcode (`Run`)
-- `build/Build/Products/Release/Wave.app`
-
-## Personal-Use Release Build
-
-For a local personal-use release flow:
-
-```bash
-make release
-```
+> If you have the production Wave app installed, quit it first to avoid hotkey and audio tap conflicts.
 
 ## What To Focus On
 
