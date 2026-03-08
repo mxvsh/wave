@@ -44,6 +44,7 @@ jobs:
             -configuration Release \
             -derivedDataPath build \
             MARKETING_VERSION="${{ steps.version.outputs.marketing_version }}" \
+            CURRENT_PROJECT_VERSION="${{ steps.version.outputs.marketing_version }}" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO
 
