@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.4](https://github.com/mxvsh/wave/compare/v0.2.3...v0.2.4) (2026-03-08)
+
+### Bug Fixes
+
+* `v` prefix in Info.plist ([a29dda6](https://github.com/mxvsh/wave/commit/a29dda629907a3df985b7850eb677d94c29d4234))
+
 ## [0.2.3](https://github.com/mxvsh/wave/compare/v0.2.2...v0.2.3) (2026-03-08)
 
 ## [0.2.2](https://github.com/mxvsh/wave/compare/v0.2.1...v0.2.2) (2026-03-07)
