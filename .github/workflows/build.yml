@@ -51,10 +51,13 @@ jobs:
         run: codesign --force --deep --sign - build/Build/Products/Release/Wave.app
 
       - name: Upload app
+        run: ditto -c -k --sequesterRsrc --keepParent build/Build/Products/Release/Wave.app Wave.app.zip
+
+      - name: Upload app artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Wave.app
-          path: build/Build/Products/Release/Wave.app
+          name: Wave.app.zip
+          path: Wave.app.zip
 
   package:
     runs-on: macos-latest
@@ -67,8 +70,10 @@ jobs:
       - name: Download app
         uses: actions/download-artifact@v4
         with:
-          name: Wave.app
-          path: Wave.app
+          name: Wave.app.zip
+
+      - name: Extract app
+        run: ditto -x -k Wave.app.zip .
 
       - name: Install create-dmg
         run: brew install create-dmg
