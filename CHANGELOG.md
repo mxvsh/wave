@@ -1,5 +1,9 @@
 # Changelog
 
+* docs: update contributing.md (b20c303)
+* chore: separate debug package (b9abeac)
+* feat: add live permission gating section to settings (9c9d9f5)
+
 ## [0.2.5](https://github.com/mxvsh/wave/compare/v0.2.4...v0.2.5) (2026-03-08)
 
 ### Bug Fixes
