@@ -62,8 +62,11 @@ struct HomeView: View {
                         .foregroundStyle(.secondary)
                     Spacer()
                     Button("Manage...") { showDictionaryEditor = true }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
+                        .buttonStyle(.plain)
                 }
             }
 
@@ -85,8 +88,11 @@ struct HomeView: View {
                     }
                     Spacer()
                     Button("Change...") { showModelPicker = true }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
+                        .buttonStyle(.plain)
                 }
             }
 

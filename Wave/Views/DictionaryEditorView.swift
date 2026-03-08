@@ -51,6 +51,11 @@ struct DictionaryEditorView: View {
                     .textFieldStyle(.roundedBorder)
                     .onSubmit { addTerm(to: &state.customVocabulary) }
                 Button("Add") { addTerm(to: &state.customVocabulary) }
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
+                    .buttonStyle(.plain)
                     .disabled(newTerm.trimmingCharacters(in: .whitespaces).isEmpty)
             }
         }
