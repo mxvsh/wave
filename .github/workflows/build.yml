@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-26
 
     outputs:
       marketing_version: ${{ steps.version.outputs.marketing_version }}
@@ -60,7 +60,7 @@ jobs:
           path: Wave.app.zip
 
   package:
-    runs-on: macos-latest
+    runs-on: macos-26
     needs: build
 
     outputs:
@@ -103,7 +103,7 @@ jobs:
           path: ${{ steps.dmg.outputs.dmg_name }}
 
   release:
-    runs-on: macos-latest
+    runs-on: macos-26
     needs: [build, package]
 
     steps:
