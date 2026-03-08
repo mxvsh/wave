@@ -53,15 +53,10 @@ struct WaveApp: App {
             Divider()
 
             Button("Settings...") {
-                // Show the window immediately (it already exists, just hidden)
-                let win = NSApp.windows.first(where: { !($0 is NSPanel) })
-                win?.makeKeyAndOrderFront(nil)
-                if win == nil { openWindow(id: "main") }
+                openWindow(id: "main")
                 NSApp.activate(ignoringOtherApps: true)
-                // Re-activate after the menu finishes closing (~menu animation duration)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                     NSApp.activate(ignoringOtherApps: true)
-                    NSApp.windows.first(where: { !($0 is NSPanel) })?.makeKeyAndOrderFront(nil)
                 }
             }
             .keyboardShortcut(",", modifiers: .command)
