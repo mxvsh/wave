@@ -292,7 +292,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = wave/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Wave;
+				INFOPLIST_KEY_CFBundleDisplayName = "Wave (Debug)";
 				INFOPLIST_KEY_CFBundleName = Wave;
 				INFOPLIST_KEY_LSUIElement = NO;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -306,7 +306,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = io.monawwar.wave;
+				PRODUCT_BUNDLE_IDENTIFIER = io.monawwar.wave.debug;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
