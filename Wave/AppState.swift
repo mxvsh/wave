@@ -36,6 +36,8 @@ final class AppState {
     var includePunctuation: Bool {
         didSet { UserDefaults.standard.set(includePunctuation, forKey: "includePunctuation") }
     }
+    var muteSystemAudio: Bool {
+        didSet { UserDefaults.standard.set(muteSystemAudio, forKey: "muteSystemAudio") }
     var customVocabulary: [String] {
         didSet { UserDefaults.standard.set(customVocabulary, forKey: "customVocabulary") }
     }
@@ -69,6 +71,7 @@ final class AppState {
         } else {
             includePunctuation = UserDefaults.standard.bool(forKey: "includePunctuation")
         }
+        muteSystemAudio = UserDefaults.standard.bool(forKey: "muteSystemAudio")
         customVocabulary = UserDefaults.standard.stringArray(forKey: "customVocabulary") ?? []
 
         // Default shortcut: Control + Space
@@ -134,8 +137,10 @@ final class AppState {
         do {
             status = .recording
             showOverlay()
+            if muteSystemAudio { SystemAudioDucker.duck() }
             try await transcriptionService.startRecording()
         } catch {
+            if muteSystemAudio { SystemAudioDucker.restore() }
             status = .error("Recording failed")
             hideOverlay()
             try? await Task.sleep(for: .seconds(2))
@@ -147,6 +152,8 @@ final class AppState {
         status = .transcribing
         updateOverlay()
 
+        let text = await transcriptionService.stopRecordingAndTranscribe(includePunctuation: includePunctuation)
+        if muteSystemAudio { SystemAudioDucker.restore() }
         let prompt = customVocabulary.isEmpty ? nil : customVocabulary.joined(separator: ", ")
         let text = await transcriptionService.stopRecordingAndTranscribe(includePunctuation: includePunctuation, initialPrompt: prompt)
 
