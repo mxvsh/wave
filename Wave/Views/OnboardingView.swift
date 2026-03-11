@@ -1,8 +1,11 @@
 import SwiftUI
+import Combine
 
 struct OnboardingView: View {
     @Environment(AppState.self) private var appState
     @State private var step = 0
+    @State private var micGranted = PermissionService.isMicrophoneAuthorized()
+    @State private var accessibilityGranted = PermissionService.isAccessibilityGranted()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -64,7 +67,7 @@ struct OnboardingView: View {
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
             HStack(spacing: 12) {
-                if PermissionService.isMicrophoneAuthorized() {
+                if micGranted {
                     Label("Granted", systemImage: "checkmark.circle.fill")
                         .foregroundStyle(.green)
                     Button("Next") { step = 2 }
@@ -72,7 +75,7 @@ struct OnboardingView: View {
                 } else {
                     Button("Grant Access") {
                         Task {
-                            _ = await PermissionService.requestMicrophoneAccess()
+                            micGranted = await PermissionService.requestMicrophoneAccess()
                         }
                     }
                     .buttonStyle(.borderedProminent)
@@ -95,7 +98,7 @@ struct OnboardingView: View {
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
             HStack(spacing: 12) {
-                if PermissionService.isAccessibilityGranted() {
+                if accessibilityGranted {
                     Label("Granted", systemImage: "checkmark.circle.fill")
                         .foregroundStyle(.green)
                     Button("Next") { step = 3 }
@@ -110,6 +113,9 @@ struct OnboardingView: View {
                 }
             }
             .controlSize(.large)
+            .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
+                accessibilityGranted = PermissionService.isAccessibilityGranted()
+            }
         }
     }
 

@@ -1,0 +1,19 @@
+{
+  "git": {
+    "commitMessage": "chore: release v${version}",
+    "tagName": "v${version}",
+    "requireCleanWorkingDir": true
+  },
+  "github": {
+    "release": false
+  },
+  "hooks": {
+    "before:git:release": "xcrun agvtool new-marketing-version ${version} && xcrun agvtool new-version -all ${version} && git add Wave.xcodeproj/project.pbxproj Wave/Info.plist CHANGELOG.md"
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": "conventionalcommits",
+      "infile": "CHANGELOG.md"
+    }
+  }
+}

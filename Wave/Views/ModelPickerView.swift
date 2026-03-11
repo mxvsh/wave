@@ -36,7 +36,11 @@ struct ModelPickerView: View {
                         Task { await appState.loadSelectedModel() }
                     }
                 }
-                .buttonStyle(.bordered)
+                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
+                .buttonStyle(.plain)
             }
         }
         .padding()
@@ -73,8 +77,11 @@ struct ModelPickerView: View {
                     appState.modelManager.selectModel(model)
                     Task { await appState.loadSelectedModel() }
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
+                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
+                .buttonStyle(.plain)
             } else if isDownloading {
                 let progress = appState.modelManager.downloadProgress[model.id.uuidString] ?? 0
                 HStack(spacing: 8) {
@@ -92,8 +99,11 @@ struct ModelPickerView: View {
                 Button("Download") {
                     appState.modelManager.download(model)
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
+                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
+                .buttonStyle(.plain)
             }
         }
         .padding(.horizontal, 12)

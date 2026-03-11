@@ -283,7 +283,7 @@
 				CODE_SIGN_ENTITLEMENTS = wave/wave.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 0.2.8;
 				DEVELOPMENT_TEAM = 996Y4MJA7D;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -291,10 +291,10 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_KEY_CFBundleDisplayName = Wave;
+				INFOPLIST_FILE = wave/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Wave (Debug)";
 				INFOPLIST_KEY_CFBundleName = Wave;
 				INFOPLIST_KEY_LSUIElement = NO;
-				INFOPLIST_FILE = wave/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Wave needs microphone access to record speech for transcription.";
 				INFOPLIST_KEY_SUAutomaticallyUpdate = YES;
@@ -306,7 +306,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = io.monawwar.wave;
+				PRODUCT_BUNDLE_IDENTIFIER = io.monawwar.wave.debug;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -326,7 +326,7 @@
 				CODE_SIGN_ENTITLEMENTS = wave/wave.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 0.2.8;
 				DEVELOPMENT_TEAM = 996Y4MJA7D;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -334,10 +334,10 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = wave/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Wave;
 				INFOPLIST_KEY_CFBundleName = Wave;
 				INFOPLIST_KEY_LSUIElement = NO;
-				INFOPLIST_FILE = wave/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Wave needs microphone access to record speech for transcription.";
 				INFOPLIST_KEY_SUAutomaticallyUpdate = YES;

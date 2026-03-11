@@ -10,7 +10,16 @@ Wave is a lightweight, native macOS dictation app focused on fast voice-to-text 
 
 ## Quick start
 
-Build it yourself for free from source, or get the ready-to-use app on [Gumroad](https://monawwar.gumroad.com/l/wave) with lifetime updates for just **$5.99**.
+Download the latest DMG from [Releases](https://github.com/mxvsh/wave/releases/latest).
+
+> **Note:** Wave is not code-signed. On first launch, macOS will block it. To open it:
+> 1. Right-click `Wave.app` → **Open**
+> 2. Click **Open** in the dialog
+>
+> Alternatively, run in Terminal:
+> ```bash
+> xattr -dr com.apple.quarantine /Applications/Wave.app
+> ```
 
 ## Build from source
 
@@ -30,16 +39,12 @@ Or launch from Xcode:
 - Select scheme `Wave`
 - Run
 
-## Notes
-
-- This repository is intended for personal/local use builds.
-- No hosted update/release setup is required to run the app locally.
-
 ## Roadmap
 
 - [x] Toggle-style recording mode from settings
 - [x] Local/offline transcription with Whisper models
-- [ ] Add optional text cleanup modes (punctuation, capitalization, concise cleanup)
+- [x] Add optional text cleanup modes (punctuation, capitalization, concise cleanup)
+- [x] Add support for custom dictionary words
 - [ ] Add app-specific behavior profiles (different formatting for IDE/chat/docs)
 - [ ] Add recent dictation history with one-click reinsert/copy
 - [ ] Add quality presets for speed vs accuracy

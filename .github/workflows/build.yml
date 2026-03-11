@@ -1,0 +1,179 @@
+name: Build & Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-26
+
+    outputs:
+      marketing_version: ${{ steps.version.outputs.marketing_version }}
+      tag: ${{ steps.version.outputs.tag }}
+      is_release: ${{ steps.version.outputs.is_release }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set version
+        id: version
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+            echo "tag=$TAG" >> $GITHUB_OUTPUT
+            echo "marketing_version=${TAG#v}" >> $GITHUB_OUTPUT
+            echo "is_release=true" >> $GITHUB_OUTPUT
+          else
+            SHORT_SHA="${GITHUB_SHA:0:7}"
+            echo "tag=dev-${SHORT_SHA}" >> $GITHUB_OUTPUT
+            echo "marketing_version=$SHORT_SHA" >> $GITHUB_OUTPUT
+            echo "is_release=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build
+        run: |
+          xcodebuild \
+            -project Wave.xcodeproj \
+            -scheme Wave \
+            -configuration Release \
+            -derivedDataPath build \
+            MARKETING_VERSION="${{ steps.version.outputs.marketing_version }}" \
+            CURRENT_PROJECT_VERSION="${{ steps.version.outputs.marketing_version }}" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
+
+      - name: Ad-hoc sign
+        run: codesign --force --deep --sign - build/Build/Products/Release/Wave.app
+
+      - name: Upload app
+        run: ditto -c -k --sequesterRsrc --keepParent build/Build/Products/Release/Wave.app Wave.app.zip
+
+      - name: Upload app artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Wave.app.zip
+          path: Wave.app.zip
+
+  package:
+    runs-on: macos-26
+    needs: build
+
+    outputs:
+      dmg_name: ${{ steps.dmg.outputs.dmg_name }}
+
+    steps:
+      - name: Download app
+        uses: actions/download-artifact@v4
+        with:
+          name: Wave.app.zip
+
+      - name: Extract app
+        run: ditto -x -k Wave.app.zip .
+
+      - name: Install create-dmg
+        run: brew install create-dmg
+
+      - name: Create DMG
+        id: dmg
+        run: |
+          TAG="${{ needs.build.outputs.tag }}"
+          DMG_NAME="Wave-Installer-${TAG}.dmg"
+          echo "dmg_name=$DMG_NAME" >> $GITHUB_OUTPUT
+
+          create-dmg \
+            --volname "Wave" \
+            --window-pos 200 120 \
+            --window-size 640 360 \
+            --icon-size 96 \
+            --icon "Wave.app" 180 170 \
+            --hide-extension "Wave.app" \
+            --app-drop-link 460 170 \
+            "$DMG_NAME" \
+            Wave.app/
+
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.dmg.outputs.dmg_name }}
+          path: ${{ steps.dmg.outputs.dmg_name }}
+
+  release:
+    runs-on: macos-26
+    needs: [build, package]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download DMG
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.package.outputs.dmg_name }}
+          path: release-dir
+
+      - name: Install Sparkle tools
+        if: needs.build.outputs.is_release == 'true'
+        run: |
+          curl -L https://github.com/sparkle-project/Sparkle/releases/download/2.9.0/Sparkle-2.9.0.tar.xz -o sparkle.tar.xz
+          mkdir sparkle-tools
+          tar -xf sparkle.tar.xz -C sparkle-tools
+          SPARKLE_BIN=$(find sparkle-tools -name generate_appcast -type f | head -1 | xargs dirname)
+          echo "$SPARKLE_BIN" >> $GITHUB_PATH
+
+      - name: Generate appcast
+        if: needs.build.outputs.is_release == 'true'
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          TAG="${{ needs.build.outputs.tag }}"
+          DMG="${{ needs.package.outputs.dmg_name }}"
+
+          echo "$SPARKLE_PRIVATE_KEY" > /tmp/sparkle.key
+
+          generate_appcast \
+            --ed-key-file /tmp/sparkle.key \
+            --download-url-prefix "https://github.com/mxvsh/wave/releases/download/${TAG}/" \
+            --link "https://github.com/mxvsh/wave" \
+            release-dir/
+          rm /tmp/sparkle.key
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ needs.build.outputs.tag }}"
+          DMG="${{ needs.package.outputs.dmg_name }}"
+          IS_RELEASE="${{ needs.build.outputs.is_release }}"
+
+          if [[ "$IS_RELEASE" == "true" ]]; then
+            VERSION="${{ needs.build.outputs.marketing_version }}"
+            awk "/^## \[${VERSION}\]/{found=1; next} found && /^## /{exit} found{print}" CHANGELOG.md > release-notes.md
+            gh release create "$TAG" \
+              --title "$TAG" \
+              --notes-file release-notes.md \
+              "release-dir/$DMG"
+          else
+            gh release create "$TAG" \
+              --title "$TAG" \
+              --prerelease \
+              --notes "Development build from commit ${GITHUB_SHA}" \
+              "release-dir/$DMG"
+          fi
+
+      - name: Push appcast to gh-pages
+        if: needs.build.outputs.is_release == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages
+          git checkout gh-pages
+          cp release-dir/appcast.xml appcast.xml
+          git add appcast.xml
+          git commit -m "Update appcast for ${{ needs.build.outputs.tag }}"
+          git push origin gh-pages

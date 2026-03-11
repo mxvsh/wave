@@ -38,6 +38,8 @@ final class AppState {
     }
     var muteSystemAudio: Bool {
         didSet { UserDefaults.standard.set(muteSystemAudio, forKey: "muteSystemAudio") }
+    var customVocabulary: [String] {
+        didSet { UserDefaults.standard.set(customVocabulary, forKey: "customVocabulary") }
     }
 
     // MARK: - Services
@@ -70,6 +72,7 @@ final class AppState {
             includePunctuation = UserDefaults.standard.bool(forKey: "includePunctuation")
         }
         muteSystemAudio = UserDefaults.standard.bool(forKey: "muteSystemAudio")
+        customVocabulary = UserDefaults.standard.stringArray(forKey: "customVocabulary") ?? []
 
         // Default shortcut: Control + Space
         if hotkeyKeyCode == 0 && hotkeyModifiers == 0 {
@@ -151,6 +154,8 @@ final class AppState {
 
         let text = await transcriptionService.stopRecordingAndTranscribe(includePunctuation: includePunctuation)
         if muteSystemAudio { SystemAudioDucker.restore() }
+        let prompt = customVocabulary.isEmpty ? nil : customVocabulary.joined(separator: ", ")
+        let text = await transcriptionService.stopRecordingAndTranscribe(includePunctuation: includePunctuation, initialPrompt: prompt)
 
         hideOverlay()
 

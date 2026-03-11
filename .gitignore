@@ -69,5 +69,7 @@ fastlane/screenshots/**/*.png
 fastlane/test_output
 
 # Large binaries
-whisper.xcframework/
 models/
+
+# Node dependencies
+node_modules/
