@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.10](https://github.com/mxvsh/wave/compare/v0.2.9...v0.2.10) (2026-03-11)
+
+### Bug Fixes
+
+* remove duplicate transcribe call ([ed013f7](https://github.com/mxvsh/wave/commit/ed013f799fbc6a4539679b3b346a0ab8087bec51))
+
 ## [0.2.9](https://github.com/mxvsh/wave/compare/v0.2.8...v0.2.9) (2026-03-11)
 
 ### Features
