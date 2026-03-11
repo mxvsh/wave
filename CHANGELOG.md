@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.9](https://github.com/mxvsh/wave/compare/v0.2.8...v0.2.9) (2026-03-11)
+
+### Features
+
+* mute system audio during dictation ([#3](https://github.com/mxvsh/wave/issues/3)) ([9c6dc44](https://github.com/mxvsh/wave/commit/9c6dc447b470292baa30c19f09c71dd3c6926423))
+
 ## [0.2.8](https://github.com/mxvsh/wave/compare/v0.2.7...v0.2.8) (2026-03-08)
 
 ### Bug Fixes
