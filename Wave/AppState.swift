@@ -38,6 +38,7 @@ final class AppState {
     }
     var muteSystemAudio: Bool {
         didSet { UserDefaults.standard.set(muteSystemAudio, forKey: "muteSystemAudio") }
+    }
     var customVocabulary: [String] {
         didSet { UserDefaults.standard.set(customVocabulary, forKey: "customVocabulary") }
     }
@@ -152,10 +153,9 @@ final class AppState {
         status = .transcribing
         updateOverlay()
 
-        let text = await transcriptionService.stopRecordingAndTranscribe(includePunctuation: includePunctuation)
-        if muteSystemAudio { SystemAudioDucker.restore() }
         let prompt = customVocabulary.isEmpty ? nil : customVocabulary.joined(separator: ", ")
         let text = await transcriptionService.stopRecordingAndTranscribe(includePunctuation: includePunctuation, initialPrompt: prompt)
+        if muteSystemAudio { SystemAudioDucker.restore() }
 
         hideOverlay()
 
