@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.2.11](https://github.com/mxvsh/wave/compare/v0.2.10...v0.2.11) (2026-03-17)
+
 ## [0.2.10](https://github.com/mxvsh/wave/compare/v0.2.9...v0.2.10) (2026-03-11)
 
 ### Bug Fixes
