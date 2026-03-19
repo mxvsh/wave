@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.12](https://github.com/mxvsh/wave/compare/v0.2.11...v0.2.12) (2026-03-19)
+
+### Bug Fixes
+
+* set MACOSX_DEPLOYMENT_TARGET to 14 ([7c3171f](https://github.com/mxvsh/wave/commit/7c3171feb3da2faaf3e21c194f47c22638d9b670))
+
 ## [0.2.11](https://github.com/mxvsh/wave/compare/v0.2.10...v0.2.11) (2026-03-17)
 
 ## [0.2.10](https://github.com/mxvsh/wave/compare/v0.2.9...v0.2.10) (2026-03-11)
