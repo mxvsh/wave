@@ -3,14 +3,14 @@
     <channel>
         <title>Wave</title>
         <item>
-            <title>0.2.11</title>
-            <pubDate>Tue, 17 Mar 2026 17:54:53 +0000</pubDate>
+            <title>0.2.12</title>
+            <pubDate>Thu, 19 Mar 2026 05:44:07 +0000</pubDate>
             <link>https://github.com/mxvsh/wave</link>
-            <sparkle:version>0.2.11</sparkle:version>
-            <sparkle:shortVersionString>0.2.11</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <sparkle:version>0.2.12</sparkle:version>
+            <sparkle:shortVersionString>0.2.12</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <enclosure url="https://github.com/mxvsh/wave/releases/download/v0.2.11/Wave-Installer-v0.2.11.dmg" length="2970946" type="application/octet-stream" sparkle:edSignature="2hxZVEfXr1JcOGY9RTRo61ebtqU5Qn8vXNBk3Ma746N7aaBkVDRKGIONzHp1imjUavZZroqeZuI1Be4PvRD4Ag=="/>
+            <enclosure url="https://github.com/mxvsh/wave/releases/download/v0.2.12/Wave-Installer-v0.2.12.dmg" length="2971888" type="application/octet-stream" sparkle:edSignature="31b4ONLLnvUHaEwnRVQSpZJb/E9I6z6CyGG9xDMUShwu1n6eWqV9DMJZwmQGxgLe1HtLPsfFRafyKWDz93dXDg=="/>
         </item>
     </channel>
 </rss>
