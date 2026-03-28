@@ -123,6 +123,10 @@ final class ModelManager {
         selectedModelPath = path
     }
 
+    func clearSelection() {
+        selectedModelPath = nil
+    }
+
     func deleteModel(_ model: WhisperModel) {
         let url = fileURL(for: model)
         try? FileManager.default.removeItem(at: url)

@@ -5,6 +5,7 @@ import AVFoundation
 final class TranscriptionService: NSObject, AVAudioRecorderDelegate {
     private var whisperContext: WhisperContext?
     private let recorder = AudioRecorder()
+    private let groqService = GroqTranscriptionService()
     private var recordedFile: URL?
     private var onTranscription: ((String) -> Void)?
     private var onError: ((String) -> Void)?
@@ -34,25 +35,71 @@ final class TranscriptionService: NSObject, AVAudioRecorderDelegate {
         var errorDescription: String? { "Microphone access denied" }
     }
 
-    func stopRecordingAndTranscribe(includePunctuation: Bool, initialPrompt: String? = nil) async -> String? {
+    enum TranscriptionError: LocalizedError {
+        case recordingMissing
+        case modelNotLoaded
+        case groqAPIKeyMissing
+
+        var errorDescription: String? {
+            switch self {
+            case .recordingMissing:
+                return "Recording file missing"
+            case .modelNotLoaded:
+                return "No model loaded"
+            case .groqAPIKeyMissing:
+                return "Groq API key missing"
+            }
+        }
+    }
+
+    func stopRecordingAndTranscribe(
+        includePunctuation: Bool,
+        provider: TranscriptionProvider,
+        groqAPIKey: String,
+        groqModel: GroqWhisperModel,
+        initialPrompt: String? = nil
+    ) async throws -> String? {
         await recorder.stopRecording()
 
-        guard let recordedFile = recordedFile else { return nil }
-        guard let whisperContext = whisperContext else { return nil }
+        guard let recordedFile = recordedFile else {
+            throw TranscriptionError.recordingMissing
+        }
 
         do {
-            let samples = try decodeWaveFile(recordedFile)
-            let peak = samples.map { abs($0) }.max() ?? 0
-            print("[wave] decoded \(samples.count) samples, peak amplitude: \(peak)")
-            await whisperContext.fullTranscribe(samples: samples, initialPrompt: initialPrompt)
-            let text = await whisperContext.getTranscription()
+            let text: String
+
+            switch provider {
+            case .localWhisper:
+                guard let whisperContext = whisperContext else {
+                    throw TranscriptionError.modelNotLoaded
+                }
+
+                let samples = try decodeWaveFile(recordedFile)
+                let peak = samples.map { abs($0) }.max() ?? 0
+                print("[wave] decoded \(samples.count) samples, peak amplitude: \(peak)")
+                await whisperContext.fullTranscribe(samples: samples, initialPrompt: initialPrompt)
+                text = await whisperContext.getTranscription()
+            case .groqAPI:
+                let trimmedAPIKey = groqAPIKey.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !trimmedAPIKey.isEmpty else {
+                    throw TranscriptionError.groqAPIKeyMissing
+                }
+
+                text = try await groqService.transcribe(
+                    fileURL: recordedFile,
+                    apiKey: trimmedAPIKey,
+                    model: groqModel,
+                    prompt: initialPrompt
+                )
+            }
+
             print("[wave] raw transcription: '\(text)'")
             let cleaned = Self.clean(text, includePunctuation: includePunctuation)
             print("[wave] cleaned: '\(cleaned ?? "nil — nothing to paste")'")
             return cleaned
         } catch {
             print("[wave] transcription error: \(error)")
-            return nil
+            throw error
         }
     }
 
