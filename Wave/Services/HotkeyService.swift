@@ -12,7 +12,7 @@ final class HotkeyService {
     private var runLoopSource: CFRunLoopSource?
     private var modifierShortcutIsPressed = false
 
-    func start() {
+    func start() -> Bool {
         modifierShortcutIsPressed = false
         let eventMask: CGEventMask = (1 << CGEventType.keyDown.rawValue) | (1 << CGEventType.keyUp.rawValue) | (1 << CGEventType.flagsChanged.rawValue)
 
@@ -33,13 +33,14 @@ final class HotkeyService {
             userInfo: selfPtr
         ) else {
             print("Failed to create event tap. Check Accessibility permissions.")
-            return
+            return false
         }
 
         eventTap = tap
         runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
         CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
         CGEvent.tapEnable(tap: tap, enable: true)
+        return true
     }
 
     func stop() {

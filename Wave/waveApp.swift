@@ -16,9 +16,6 @@ struct WaveApp: App {
         .defaultPosition(.center)
         .commands {
             CommandGroup(replacing: .newItem) {}
-            CommandGroup(replacing: .undoRedo) {}
-            CommandGroup(replacing: .pasteboard) {}
-            CommandGroup(replacing: .textEditing) {}
             CommandGroup(replacing: .textFormatting) {}
             CommandGroup(replacing: .toolbar) {}
             CommandGroup(replacing: .sidebar) {}
@@ -30,10 +27,10 @@ struct WaveApp: App {
         MenuBarExtra {
             switch appState.status {
             case .idle:
-                if appState.isModelLoaded {
+                if appState.isReadyToDictate {
                     Label("Ready", systemImage: "checkmark.circle")
                 } else {
-                    Label("No model loaded", systemImage: "exclamationmark.triangle")
+                    Label(appState.readyStatusText, systemImage: "exclamationmark.triangle")
                 }
             case .recording:
                 Label("Recording...", systemImage: "mic.fill")
