@@ -51,6 +51,14 @@ struct HomeView: View {
                 }
             }
             .navigationSplitViewColumnWidth(min: 140, ideal: 160, max: 200)
+            .safeAreaInset(edge: .bottom) {
+                Text("Wave v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "")")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.quaternary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+            }
         } detail: {
             Group {
                 switch selection ?? .home {
