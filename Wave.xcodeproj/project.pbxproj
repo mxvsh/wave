@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		3C06E02C2F534ACA00CD3EDD /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 3C06E02B2F534ACA00CD3EDD /* Sparkle */; };
-		3C0D22DD2F79AF4500A4A6BB /* PhosphorSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 3C0D22DC2F79AF4500A4A6BB /* PhosphorSwift */; };
 		3CA5B0012F50700000DBB766 /* whisper.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CA5B0002F50700000DBB766 /* whisper.xcframework */; };
 		3CA5B0022F50700000DBB766 /* whisper.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3CA5B0002F50700000DBB766 /* whisper.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -47,7 +46,6 @@
 			files = (
 				3CA5B0012F50700000DBB766 /* whisper.xcframework in Frameworks */,
 				3C06E02C2F534ACA00CD3EDD /* Sparkle in Frameworks */,
-				3C0D22DD2F79AF4500A4A6BB /* PhosphorSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,7 +91,6 @@
 			name = Wave;
 			packageProductDependencies = (
 				3C06E02B2F534ACA00CD3EDD /* Sparkle */,
-				3C0D22DC2F79AF4500A4A6BB /* PhosphorSwift */,
 			);
 			productName = Wave;
 			productReference = 3CA5A78F2F5063F600DBB766 /* Wave.app */;
@@ -125,7 +122,6 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				3C06E02A2F534ACA00CD3EDD /* XCRemoteSwiftPackageReference "Sparkle" */,
-				3C0D22DB2F79AF4500A4A6BB /* XCRemoteSwiftPackageReference "swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3CA5A7902F5063F600DBB766 /* Products */;
@@ -397,14 +393,6 @@
 				minimumVersion = 2.9.0;
 			};
 		};
-		3C0D22DB2F79AF4500A4A6BB /* XCRemoteSwiftPackageReference "swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/phosphor-icons/swift";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.1.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -412,11 +400,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3C06E02A2F534ACA00CD3EDD /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
-		};
-		3C0D22DC2F79AF4500A4A6BB /* PhosphorSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3C0D22DB2F79AF4500A4A6BB /* XCRemoteSwiftPackageReference "swift" */;
-			productName = PhosphorSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
