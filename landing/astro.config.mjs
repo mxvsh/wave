@@ -13,5 +13,5 @@ export default defineConfig({
   },
 
   site: "https://wave.mxv.sh",
-  integrations: [sitemap()]
+  integrations: [sitemap({ filter: (page) => !page.includes("/og-banner") })]
 });
