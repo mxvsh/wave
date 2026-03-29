@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wave — The right option for your every word</title>
+  <meta name="description" content="A native macOS dictation app that turns your voice into text instantly. Local Whisper for complete privacy, or Groq for ultra-fast transcription." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            deep:    '#06070a',
+            base:    '#0a0b10',
+            elevated:'#0f1018',
+            accent:  '#7B6EF6',
+            accent2: '#4F8EF7',
+            green:   '#34D399',
+          },
+          backgroundImage: {
+            'hero-gradient': 'linear-gradient(135deg, #7B6EF6 0%, #4F8EF7 60%, #A78BFA 100%)',
+          },
+          animation: {
+            'drift-1':   'drift1 20s ease-in-out infinite alternate',
+            'drift-2':   'drift2 16s ease-in-out infinite alternate',
+            'drift-3':   'drift3 22s ease-in-out infinite alternate',
+            'pulse-dot': 'pulseDot 2.5s ease-in-out infinite',
+            'blink':     'blink 1.1s step-end infinite',
+          },
+          keyframes: {
+            drift1:   { from:{ transform:'translate(0,0) scale(1)' }, to:{ transform:'translate(40px,30px) scale(1.08)' } },
+            drift2:   { from:{ transform:'translate(0,0) scale(1)' }, to:{ transform:'translate(-30px,20px) scale(1.06)' } },
+            drift3:   { from:{ transform:'translate(0,0) scale(1)' }, to:{ transform:'translate(20px,-25px) scale(1.05)' } },
+            pulseDot: { '0%,100%':{ opacity:'1', transform:'scale(1)' }, '50%':{ opacity:'0.6', transform:'scale(0.85)' } },
+            blink:    { '0%,100%':{ opacity:'1' }, '50%':{ opacity:'0' } },
+          },
+          boxShadow: {
+            'accent-glow': '0 0 32px rgba(123,110,246,0.25)',
+            'accent-glow-lg': '0 0 56px rgba(123,110,246,0.3)',
+            'card': '0 12px 40px rgba(0,0,0,0.3)',
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #06070a; -webkit-font-smoothing: antialiased; }
+
+    /* Gradient text */
+    .text-gradient {
+      background: linear-gradient(135deg, #7B6EF6 0%, #4F8EF7 60%, #A78BFA 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Glass surface */
+    .glass {
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .glass-md {
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Floating pill nav */
+    .nav-pill {
+      background: rgba(14,15,22,0.90);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: 0 4px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    /* Scroll reveal */
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1); }
+    .reveal.in { opacity: 1; transform: none; }
+    .delay-1 { transition-delay: 0.08s; }
+    .delay-2 { transition-delay: 0.16s; }
+    .delay-3 { transition-delay: 0.24s; }
+    .delay-4 { transition-delay: 0.32s; }
+    .delay-5 { transition-delay: 0.40s; }
+    .delay-6 { transition-delay: 0.48s; }
+
+    /* Key cap */
+    .key-cap {
+      display: inline-flex; align-items: center;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-bottom-width: 2px;
+      border-radius: 6px;
+      padding: 2px 9px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #8A8F98;
+    }
+
+    /* Provider tab */
+    .provider-tab { cursor: pointer; transition: background 0.18s, color 0.18s; }
+    .provider-tab.active { background: #7B6EF6; color: #fff; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity:1; transform:none; transition:none; }
+      *, *::before, *::after { animation-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body class="font-sans text-[#EDEDEF] overflow-x-hidden">
+
+<!-- Ambient blobs -->
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+  <div class="blob absolute w-[560px] h-[560px] rounded-full blur-[80px] opacity-[0.12] bg-accent -top-40 -left-28 animate-drift-1"></div>
+  <div class="blob absolute w-[480px] h-[480px] rounded-full blur-[80px] opacity-[0.12] bg-accent2 top-[40%] -right-44 animate-drift-2"></div>
+  <div class="blob absolute w-[360px] h-[360px] rounded-full blur-[80px] opacity-[0.07] bg-blue-500 bottom-[10%] left-[25%] animate-drift-3"></div>
+</div>
+
+<!-- ── Floating Pill Nav ── -->
+<nav class="fixed top-0 left-0 right-0 z-50 px-5 pt-5 pointer-events-none" role="navigation" aria-label="Main navigation">
+  <div class="nav-pill max-w-3xl mx-auto rounded-full flex items-center justify-between pl-4 pr-2 py-2 pointer-events-auto">
+
+    <!-- Logo -->
+    <a href="#" class="flex items-center gap-2.5 font-semibold text-[15px] text-[#EDEDEF] no-underline shrink-0" aria-label="Wave home">
+      <svg width="26" height="26" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <rect width="28" height="28" rx="8" fill="url(#nav-logo-g)"/>
+        <path d="M5 14 Q7.5 8 10 14 Q12.5 20 15 14 Q17.5 8 20 14 Q22.5 20 23 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <defs>
+          <linearGradient id="nav-logo-g" x1="0" y1="0" x2="28" y2="28">
+            <stop offset="0%" stop-color="#7B6EF6"/><stop offset="100%" stop-color="#4F8EF7"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      Wave
+    </a>
+
+    <!-- Links -->
+    <ul class="hidden md:flex items-center gap-0.5 list-none flex-1 justify-center">
+      <li><a href="#features"     class="text-[#8A8F98] hover:text-[#EDEDEF] hover:bg-white/[0.07] text-sm font-medium px-3.5 py-1.5 rounded-full transition-colors duration-150 no-underline">Features</a></li>
+      <li><a href="#how-it-works" class="text-[#8A8F98] hover:text-[#EDEDEF] hover:bg-white/[0.07] text-sm font-medium px-3.5 py-1.5 rounded-full transition-colors duration-150 no-underline">How it works</a></li>
+      <li><a href="#privacy"      class="text-[#8A8F98] hover:text-[#EDEDEF] hover:bg-white/[0.07] text-sm font-medium px-3.5 py-1.5 rounded-full transition-colors duration-150 no-underline">Privacy</a></li>
+      <li><a href="https://github.com/monawwar/Wave" target="_blank" rel="noopener noreferrer" class="text-[#8A8F98] hover:text-[#EDEDEF] hover:bg-white/[0.07] text-sm font-medium px-3.5 py-1.5 rounded-full transition-colors duration-150 no-underline">GitHub</a></li>
+    </ul>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-1 shrink-0">
+      <a href="#" class="hidden sm:block text-[#8A8F98] hover:text-[#EDEDEF] hover:bg-white/[0.07] text-sm font-medium px-3.5 py-2 rounded-full transition-colors duration-150 no-underline">Login</a>
+      <a href="#download" class="bg-accent hover:opacity-90 active:scale-95 text-white text-sm font-semibold px-5 py-2 rounded-full shadow-accent-glow transition-all duration-150 no-underline whitespace-nowrap">Download</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="relative z-10 pt-40 pb-24 text-center px-6">
+  <div class="max-w-4xl mx-auto">
+
+    <!-- Badge -->
+    <div class="reveal inline-flex items-center gap-2 glass-md rounded-full px-4 py-1.5 text-[13px] font-medium text-[#8A8F98] mb-8">
+      <span class="w-[7px] h-[7px] rounded-full bg-green shadow-[0_0_8px_#34D399] animate-pulse-dot shrink-0" aria-hidden="true"></span>
+      Now with Groq ultra-fast transcription
+    </div>
+
+    <!-- Headline -->
+    <h1 class="reveal delay-1 text-[clamp(44px,7vw,78px)] font-bold leading-[1.08] tracking-[-0.03em] mb-6">
+      The right option<br/>
+      <span class="text-gradient">for your every word</span>
+    </h1>
+
+    <!-- Sub -->
+    <p class="reveal delay-2 text-[clamp(16px,2.2vw,19px)] text-[#8A8F98] leading-relaxed max-w-[560px] mx-auto mb-11">
+      A native macOS dictation app that turns your voice into text instantly.
+      Local Whisper for complete privacy — or Groq for real-time speed.
+      No accounts. No friction.
+    </p>
+
+    <!-- CTAs -->
+    <div class="reveal delay-3 flex items-center justify-center gap-3 flex-wrap">
+      <a href="#download" class="inline-flex items-center gap-2 bg-accent text-white font-semibold text-[15px] px-7 py-3.5 rounded-xl shadow-accent-glow hover:shadow-accent-glow-lg hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-150 no-underline">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download for macOS
+      </a>
+      <a href="https://github.com/monawwar/Wave" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 glass-md text-[#EDEDEF] font-medium text-[15px] px-6 py-3.5 rounded-xl hover:bg-white/10 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-150 no-underline">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        View on GitHub
+      </a>
+    </div>
+
+    <!-- Hotkey hint -->
+    <p class="reveal delay-4 flex items-center justify-center gap-2 mt-8 text-[13px] text-[#4A4F5C]" aria-label="Activate with Right Option key">
+      Press <span class="key-cap" aria-hidden="true">⌥</span><span class="key-cap" aria-hidden="true">Right Option</span> anywhere to start dictating
+    </p>
+
+    <!-- Waveform pill -->
+    <div class="reveal delay-5 flex justify-center mt-12">
+      <div class="inline-flex items-center px-4 py-2.5 rounded-full bg-[#111318] border border-white/[0.1] shadow-[0_2px_20px_rgba(0,0,0,0.5)]" role="img" aria-label="Audio waveform visualization">
+        <canvas id="wave" width="140" height="28" style="width:140px;height:28px;display:block"></canvas>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="relative z-10 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent"></div>
+
+<!-- ── Features ── -->
+<section class="relative z-10 py-24 px-6" id="features">
+  <div class="max-w-5xl mx-auto">
+    <p class="reveal text-xs font-semibold tracking-[0.1em] uppercase text-accent mb-3">Features</p>
+    <h2 class="reveal delay-1 text-[clamp(28px,4vw,44px)] font-bold tracking-[-0.025em] leading-[1.15] mb-4">Built to stay out of your way</h2>
+    <p class="reveal delay-2 text-[17px] text-[#8A8F98] leading-relaxed max-w-[480px] mb-14">Every detail designed for one thing — getting your words out fast, naturally, and privately.</p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+      <div class="reveal glass rounded-2xl p-7 hover:border-white/[0.14] hover:bg-white/[0.06] hover:-translate-y-1 hover:shadow-card transition-all duration-200 cursor-default group">
+        <div class="w-11 h-11 rounded-xl bg-accent/15 flex items-center justify-center mb-5">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7B6EF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+        </div>
+        <h3 class="text-[15px] font-semibold mb-2">One-key activation</h3>
+        <p class="text-[14px] text-[#8A8F98] leading-relaxed">Hold <strong class="text-[#EDEDEF] font-semibold">Right ⌥ Option</strong> in any app and start speaking. Release to stop. That's the entire interface.</p>
+      </div>
+
+      <div class="reveal delay-1 glass rounded-2xl p-7 hover:border-white/[0.14] hover:bg-white/[0.06] hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(52,211,153,0.1)] transition-all duration-200 cursor-default">
+        <div class="w-11 h-11 rounded-xl bg-green/15 flex items-center justify-center mb-5">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h3 class="text-[15px] font-semibold mb-2">Completely private</h3>
+        <p class="text-[14px] text-[#8A8F98] leading-relaxed">Whisper runs fully on-device. Your voice never leaves your Mac — no cloud, no servers, no data collection. Ever.</p>
+      </div>
+
+      <div class="reveal delay-2 glass rounded-2xl p-7 hover:border-white/[0.14] hover:bg-white/[0.06] hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(79,142,247,0.1)] transition-all duration-200 cursor-default">
+        <div class="w-11 h-11 rounded-xl bg-accent2/15 flex items-center justify-center mb-5">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4F8EF7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="13 2 13 9 20 9"/><path d="M20 14v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l7 7z"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="19" x2="15" y2="19"/></svg>
+        </div>
+        <h3 class="text-[15px] font-semibold mb-2">Streams to your cursor</h3>
+        <p class="text-[14px] text-[#8A8F98] leading-relaxed">Text appears directly where your cursor is — no clipboard, no paste step. Just natural, flowing text as you speak.</p>
+      </div>
+
+      <div class="reveal delay-1 glass rounded-2xl p-7 hover:border-white/[0.14] hover:bg-white/[0.06] hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(251,146,60,0.1)] transition-all duration-200 cursor-default">
+        <div class="w-11 h-11 rounded-xl bg-orange-400/15 flex items-center justify-center mb-5">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FB923C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <h3 class="text-[15px] font-semibold mb-2">Groq for speed</h3>
+        <p class="text-[14px] text-[#8A8F98] leading-relaxed">Switch to Groq for ultra-fast real-time transcription when you need it — blazing responses with near-zero latency.</p>
+      </div>
+
+      <div class="reveal delay-2 glass rounded-2xl p-7 hover:border-white/[0.14] hover:bg-white/[0.06] hover:-translate-y-1 transition-all duration-200 cursor-default">
+        <div class="w-11 h-11 rounded-xl bg-teal-400/15 flex items-center justify-center mb-5">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2DD4BF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+        </div>
+        <h3 class="text-[15px] font-semibold mb-2">Works offline</h3>
+        <p class="text-[14px] text-[#8A8F98] leading-relaxed">No Wi-Fi? No problem. Whisper runs entirely locally — fully functional on planes, in basements, anywhere.</p>
+      </div>
+
+      <div class="reveal delay-3 glass rounded-2xl p-7 hover:border-white/[0.14] hover:bg-white/[0.06] hover:-translate-y-1 transition-all duration-200 cursor-default">
+        <div class="w-11 h-11 rounded-xl bg-pink-500/15 flex items-center justify-center mb-5">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EC4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h3 class="text-[15px] font-semibold mb-2">Zero friction</h3>
+        <p class="text-[14px] text-[#8A8F98] leading-relaxed">No accounts, no sign-ups, no onboarding. Download, run, and dictate. It's ready as fast as you are.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="relative z-10 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent"></div>
+
+<!-- ── How it works ── -->
+<section class="relative z-10 py-24 px-6" id="how-it-works">
+  <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+
+    <!-- Steps -->
+    <div>
+      <p class="reveal text-xs font-semibold tracking-[0.1em] uppercase text-accent mb-3">How it works</p>
+      <h2 class="reveal delay-1 text-[clamp(28px,4vw,44px)] font-bold tracking-[-0.025em] leading-[1.15] mb-4">Speak. See. Done.</h2>
+      <p class="reveal delay-2 text-[17px] text-[#8A8F98] leading-relaxed mb-10">Wave disappears into your workflow. No windows to manage, no modes to switch.</p>
+
+      <div class="flex flex-col gap-3">
+        <div class="reveal delay-2 flex gap-4 p-5 rounded-xl border border-transparent hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-200 cursor-default">
+          <div class="w-8 h-8 rounded-full bg-white/[0.07] border border-white/[0.1] flex items-center justify-center text-[13px] font-semibold text-accent shrink-0 mt-0.5" aria-hidden="true">1</div>
+          <div>
+            <p class="text-[15px] font-semibold mb-1">Hold Right Option</p>
+            <p class="text-[14px] text-[#8A8F98] leading-relaxed">Press <strong class="text-[#EDEDEF] font-semibold">⌥ Right Option</strong> anywhere on your Mac. Wave activates instantly in the background.</p>
+          </div>
+        </div>
+        <div class="reveal delay-3 flex gap-4 p-5 rounded-xl border border-transparent hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-200 cursor-default">
+          <div class="w-8 h-8 rounded-full bg-white/[0.07] border border-white/[0.1] flex items-center justify-center text-[13px] font-semibold text-accent shrink-0 mt-0.5" aria-hidden="true">2</div>
+          <div>
+            <p class="text-[15px] font-semibold mb-1">Speak naturally</p>
+            <p class="text-[14px] text-[#8A8F98] leading-relaxed">Say whatever you need. Wave listens and transcribes in real time using Whisper or Groq — your choice.</p>
+          </div>
+        </div>
+        <div class="reveal delay-4 flex gap-4 p-5 rounded-xl border border-transparent hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-200 cursor-default">
+          <div class="w-8 h-8 rounded-full bg-white/[0.07] border border-white/[0.1] flex items-center justify-center text-[13px] font-semibold text-accent shrink-0 mt-0.5" aria-hidden="true">3</div>
+          <div>
+            <p class="text-[15px] font-semibold mb-1">Release to insert</p>
+            <p class="text-[14px] text-[#8A8F98] leading-relaxed">Let go of the key. Your transcribed text is instantly typed at your cursor — in any app, any text field.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- macOS mockup -->
+    <div class="reveal delay-2">
+      <div class="rounded-[18px] overflow-hidden border border-white/[0.1] bg-elevated shadow-[0_32px_80px_rgba(0,0,0,0.5)]">
+        <!-- Traffic lights bar -->
+        <div class="bg-white/[0.04] border-b border-white/[0.07] px-4 py-3 flex items-center gap-2">
+          <div class="w-3 h-3 rounded-full bg-[#FF5F57]" aria-hidden="true"></div>
+          <div class="w-3 h-3 rounded-full bg-[#FEBC2E]" aria-hidden="true"></div>
+          <div class="w-3 h-3 rounded-full bg-[#28C840]" aria-hidden="true"></div>
+          <span class="flex-1 text-center text-[13px] text-[#4A4F5C] -ml-9">Wave</span>
+        </div>
+        <!-- Mockup body -->
+        <div class="p-7">
+          <div class="flex items-center justify-between mb-6">
+            <span class="text-[13px] text-[#8A8F98] font-medium">Transcription engine</span>
+            <div class="flex gap-1 bg-white/[0.04] border border-white/[0.08] rounded-lg p-1" role="tablist" aria-label="Provider selection">
+              <div class="provider-tab active text-[12px] font-medium px-3 py-1 rounded-md" role="tab" aria-selected="true" tabindex="0">Whisper</div>
+              <div class="provider-tab text-[12px] font-medium px-3 py-1 rounded-md text-[#8A8F98]" role="tab" aria-selected="false" tabindex="0">Groq</div>
+            </div>
+          </div>
+          <div class="bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3.5 mb-3.5">
+            <div class="text-[11px] text-[#4A4F5C] uppercase tracking-[0.08em] font-semibold mb-1.5">Model</div>
+            <div class="text-[14px] text-[#EDEDEF] font-medium">openai/whisper-large-v3</div>
+            <div class="text-[12px] text-[#4A4F5C] mt-1">Runs locally · No internet required</div>
+          </div>
+          <div class="flex items-center gap-2.5 bg-green/[0.08] border border-green/[0.2] rounded-xl px-4 py-3">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            <span class="text-[13px] text-green font-medium">Privacy mode active</span>
+          </div>
+          <div class="mt-4 bg-white/[0.04] rounded-xl px-4 py-3 text-center text-[12px] text-[#4A4F5C]">
+            Hold <strong class="text-[#EDEDEF]">⌥ Right Option</strong> to begin recording
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="relative z-10 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent"></div>
+
+<!-- ── Privacy ── -->
+<section class="relative z-10 py-24 px-6" id="privacy">
+  <div class="max-w-5xl mx-auto">
+    <p class="reveal text-xs font-semibold tracking-[0.1em] uppercase text-accent mb-3">Privacy</p>
+    <h2 class="reveal delay-1 text-[clamp(28px,4vw,44px)] font-bold tracking-[-0.025em] leading-[1.15] mb-4">Your voice stays yours</h2>
+    <p class="reveal delay-2 text-[17px] text-[#8A8F98] leading-relaxed max-w-[480px] mb-12">Wave was designed with privacy as the foundation — not as a feature.</p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+      <div class="reveal glass rounded-2xl p-7 hover:border-white/[0.14] hover:-translate-y-0.5 transition-all duration-200 cursor-default">
+        <div class="w-12 h-12 rounded-[14px] bg-green/15 flex items-center justify-center mb-5">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3 class="text-[16px] font-semibold mb-2">Local Whisper</h3>
+        <p class="text-[14px] text-[#8A8F98] leading-relaxed">OpenAI Whisper runs entirely on your Mac. Audio is processed in memory, never stored, never sent anywhere. Fully offline capable.</p>
+      </div>
+
+      <div class="reveal delay-1 glass rounded-2xl p-7 hover:border-white/[0.14] hover:-translate-y-0.5 transition-all duration-200 cursor-default">
+        <div class="w-12 h-12 rounded-[14px] bg-accent2/15 flex items-center justify-center mb-5">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4F8EF7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <h3 class="text-[16px] font-semibold mb-2">Groq option</h3>
+        <p class="text-[14px] text-[#8A8F98] leading-relaxed">When speed matters more, switch to Groq's API for near-instant transcription. You supply your own API key — we never see it.</p>
+      </div>
+
+      <div class="reveal delay-2 glass rounded-2xl p-7 sm:col-span-2 flex flex-col sm:flex-row items-start sm:items-center gap-6 hover:border-white/[0.14] hover:-translate-y-0.5 transition-all duration-200 cursor-default">
+        <div class="w-12 h-12 rounded-[14px] bg-accent/15 flex items-center justify-center shrink-0">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7B6EF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div>
+          <h3 class="text-[16px] font-semibold mb-2">No account. No telemetry. No nonsense.</h3>
+          <p class="text-[14px] text-[#8A8F98] leading-relaxed">Wave collects zero user data. No analytics trackers, no crash reporters phoning home, no usage metrics. It's a native app that runs on your machine — full stop. Open source so you can verify every claim.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="relative z-10 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent"></div>
+
+<!-- ── CTA ── -->
+<section class="relative z-10 py-24 px-6" id="download">
+  <div class="max-w-5xl mx-auto">
+    <div class="reveal glass rounded-3xl px-8 py-20 text-center relative overflow-hidden">
+      <!-- Glow -->
+      <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[480px] h-[480px] rounded-full bg-accent/[0.10] blur-[80px] pointer-events-none"></div>
+      <div class="absolute inset-0 bg-gradient-to-br from-accent/[0.05] to-transparent rounded-3xl pointer-events-none"></div>
+
+      <h2 class="relative text-[clamp(28px,4vw,44px)] font-bold tracking-[-0.025em] leading-[1.15] mb-4">Start speaking your mind</h2>
+      <p class="relative text-[17px] text-[#8A8F98] leading-relaxed max-w-[420px] mx-auto mb-10">Download Wave free. Works on macOS 14+. No account needed.</p>
+
+      <div class="relative flex items-center justify-center gap-3 flex-wrap mb-6">
+        <a href="#" class="inline-flex items-center gap-2 bg-accent text-white font-semibold text-[15px] px-7 py-3.5 rounded-xl shadow-accent-glow hover:shadow-accent-glow-lg hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-150 no-underline">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download for macOS
+        </a>
+        <a href="https://github.com/monawwar/Wave" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 glass-md text-[#EDEDEF] font-medium text-[15px] px-6 py-3.5 rounded-xl hover:bg-white/10 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-150 no-underline">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          View Source
+        </a>
+      </div>
+
+      <div class="relative flex items-center justify-center gap-5 flex-wrap text-[13px] text-[#4A4F5C]">
+        <span class="flex items-center gap-1.5"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Free &amp; open source</span>
+        <span class="flex items-center gap-1.5"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> macOS 14 Sonoma or later</span>
+        <span class="flex items-center gap-1.5"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Apple Silicon + Intel</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer class="relative z-10 border-t border-white/[0.07] py-8 px-6">
+  <div class="max-w-5xl mx-auto flex items-center justify-between gap-4 flex-wrap">
+    <a href="#" class="flex items-center gap-2 text-[15px] font-semibold text-[#8A8F98] no-underline opacity-70 hover:opacity-100 transition-opacity">
+      <svg width="22" height="22" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <rect width="28" height="28" rx="8" fill="url(#footer-g)"/>
+        <path d="M5 14 Q7.5 8 10 14 Q12.5 20 15 14 Q17.5 8 20 14 Q22.5 20 23 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <defs><linearGradient id="footer-g" x1="0" y1="0" x2="28" y2="28"><stop offset="0%" stop-color="#7B6EF6"/><stop offset="100%" stop-color="#4F8EF7"/></linearGradient></defs>
+      </svg>
+      Wave
+    </a>
+    <p class="text-[13px] text-[#4A4F5C]">© 2025 Wave. Made with care for macOS.</p>
+    <ul class="flex gap-5 list-none">
+      <li><a href="https://github.com/monawwar/Wave" target="_blank" rel="noopener noreferrer" class="text-[13px] text-[#4A4F5C] hover:text-[#8A8F98] no-underline transition-colors">GitHub</a></li>
+      <li><a href="#" class="text-[13px] text-[#4A4F5C] hover:text-[#8A8F98] no-underline transition-colors">Releases</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+  // ── Waveform pill ────────────────────────────────────────────────────
+  const canvas = document.getElementById('wave');
+  const ctx    = canvas.getContext('2d');
+  const DPR    = window.devicePixelRatio || 1;
+  const W = 140, H = 28;
+  canvas.width  = W * DPR;
+  canvas.height = H * DPR;
+  ctx.scale(DPR, DPR);
+
+  let t = 0;
+  function drawWave() {
+    ctx.clearRect(0, 0, W, H);
+    const bars = 28, barW = 2, gap = 2;
+    const totalW = bars * barW + (bars - 1) * gap;
+    const startX = (W - totalW) / 2;
+    for (let i = 0; i < bars; i++) {
+      const x   = startX + i * (barW + gap);
+      const amp = Math.abs(Math.sin(i * 0.45 + t * 1.4) * 0.5 + Math.sin(i * 0.2 + t * 0.9) * 0.3 + Math.sin(i * 0.7 + t * 2.2) * 0.2);
+      const barH = Math.max(2, amp * H * 0.85);
+      const y   = (H - barH) / 2;
+      ctx.fillStyle = `rgba(180,175,255,${0.35 + amp * 0.65})`;
+      ctx.beginPath();
+      ctx.roundRect(x, y, barW, barH, 1);
+      ctx.fill();
+    }
+    t += 0.04;
+    requestAnimationFrame(drawWave);
+  }
+  drawWave();
+
+
+  // ── Scroll reveal ──────────────────────────────────────────────────
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // ── Provider tabs ──────────────────────────────────────────────────
+  document.querySelectorAll('.provider-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.provider-tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); t.classList.add('text-[#8A8F98]'); });
+      tab.classList.add('active'); tab.setAttribute('aria-selected','true'); tab.classList.remove('text-[#8A8F98]');
+    });
+    tab.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tab.click(); } });
+  });
+</script>
+</body>
+</html>

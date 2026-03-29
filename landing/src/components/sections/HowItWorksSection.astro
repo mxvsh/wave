@@ -1,0 +1,140 @@
+---
+import SectionHeading from "../SectionHeading.astro";
+
+const steps = [
+  {
+    title: "Hold Right Option",
+    description:
+      "Press Right Option anywhere on your Mac. Wave activates instantly in the background.",
+  },
+  {
+    title: "Speak naturally",
+    description:
+      "Say whatever you need. Wave listens and transcribes in real time using Whisper or Groq.",
+  },
+  {
+    title: "Release to insert",
+    description:
+      "Let go of the key and your text is typed at the cursor in any app or text field.",
+  },
+] as const;
+
+const topKeys = [
+  { label: "J" },
+  { label: "K" },
+  { label: "L" },
+  { label: ";", sublabel: ":" },
+] as const;
+
+const middleKeys = [
+  { label: "M" },
+  { label: ",", sublabel: "<" },
+  { label: ".", sublabel: ">" },
+  { label: "/", sublabel: "?" },
+] as const;
+
+const modifierKeys = [
+  { label: "", symbol: "", width: "flex-1 min-w-[10rem]", blank: true },
+  { label: "command", symbol: "⌘", width: "w-[6.6rem]" },
+  { label: "option", symbol: "⌥", width: "w-[5.6rem]", active: true },
+] as const;
+---
+
+<section class="relative z-10 px-6 py-24" id="how-it-works">
+  <div class="mx-auto grid max-w-5xl grid-cols-1 items-center gap-16 md:grid-cols-2">
+    <div>
+      <SectionHeading
+        eyebrow="How it works"
+        title="Speak. See. Done."
+        description="Wave disappears into your workflow. No windows to manage, no modes to switch."
+        maxWidthClass="max-w-none"
+      />
+
+      <div class="mt-10 flex flex-col gap-3">
+        {steps.map((step, index) => (
+          <div
+            class:list={[
+              "reveal flex cursor-default gap-4 rounded-xl border border-transparent p-5 transition-all duration-200 hover:border-white/8 hover:bg-white/4",
+              index === 1 ? "delay-3" : index === 2 ? "delay-4" : "delay-2",
+            ]}
+          >
+            <div
+              class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/7 text-[13px] font-semibold text-[var(--color-accent)]"
+              aria-hidden="true"
+            >
+              {index + 1}
+            </div>
+            <div>
+              <p class="mb-1 text-[15px] font-semibold">{step.title}</p>
+              <p class="text-[14px] leading-relaxed text-slate-400">{step.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="reveal delay-2">
+      <div class="keyboard-stage relative overflow-hidden rounded-[28px] border border-white/8 p-6 shadow-[0_32px_80px_rgba(0,0,0,0.5)]">
+        <div class="pointer-events-none absolute -right-14 top-10 h-56 w-56 rounded-full bg-[rgba(123,110,246,0.12)] blur-3xl"></div>
+        <div class="pointer-events-none absolute bottom-8 right-20 h-20 w-28 rounded-full bg-[rgba(79,142,247,0.14)] blur-2xl"></div>
+        <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(255,255,255,0.05),transparent_42%)]"></div>
+
+        <div class="relative ml-auto max-w-[25rem]">
+          <div class="mb-4 text-right">
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-accent)]">Right-side shortcut</p>
+            <p class="mt-2 text-sm leading-relaxed text-slate-400">
+              Keep your hand on the modifier cluster. Hold
+              <span class="font-semibold text-white"> Right Option </span>
+              and speak.
+            </p>
+          </div>
+
+          <div class="space-y-3">
+            <div class="grid grid-cols-4 gap-3">
+              {topKeys.map((key) => (
+                <div class="keyboard-key keyboard-key-crop">
+                  <div class="keyboard-key-top">
+                    {key.sublabel && <span class="keyboard-key-prefix">{key.sublabel}</span>}
+                  </div>
+                  <span class="keyboard-key-label">{key.label}</span>
+                </div>
+              ))}
+            </div>
+
+            <div class="grid grid-cols-4 gap-3">
+              {middleKeys.map((key) => (
+                <div class="keyboard-key keyboard-key-crop">
+                  <div class="keyboard-key-top">
+                    {key.sublabel && <span class="keyboard-key-prefix">{key.sublabel}</span>}
+                  </div>
+                  <span class="keyboard-key-label">{key.label}</span>
+                </div>
+              ))}
+            </div>
+
+            <div class="flex items-end justify-end gap-3">
+              {modifierKeys.map((key) => (
+                <div class:list={["keyboard-key keyboard-key-bottom", key.width, key.active && "keyboard-key-active", key.blank && "keyboard-key-blank"]}>
+                  {!key.blank && <span class="keyboard-key-symbol">{key.symbol}</span>}
+                  {!key.blank && <span class="keyboard-key-word">{key.label}</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div class="reveal delay-3 keyboard-callout mt-5 ml-auto max-w-[15rem] rounded-2xl px-4 py-3">
+            <div class="mb-2 flex items-center gap-2 text-[var(--color-accent)]">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20"></path><path d="m17 5-5-3-5 3"></path><path d="m17 19-5 3-5-3"></path></svg>
+              <span class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Trigger</span>
+            </div>
+            <p class="text-sm leading-relaxed text-slate-400">
+              The
+              <span class="font-semibold text-white">Right Option</span>
+              key is the only control you need.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

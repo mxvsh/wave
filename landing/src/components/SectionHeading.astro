@@ -1,0 +1,27 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  description: string;
+  maxWidthClass?: string;
+}
+
+const {
+  eyebrow,
+  title,
+  description,
+  maxWidthClass = "max-w-[480px]",
+} = Astro.props;
+---
+
+<p class="reveal mb-3 text-xs font-semibold uppercase tracking-[0.1em] text-[var(--color-accent)]">
+  {eyebrow}
+</p>
+<h2
+  class="reveal delay-1 mb-4 text-[clamp(28px,4vw,44px)] font-bold leading-[1.15] tracking-[-0.025em]"
+>
+  {title}
+</h2>
+<p class:list={["reveal delay-2 text-[17px] leading-relaxed text-slate-400", maxWidthClass]}>
+  {description}
+</p>

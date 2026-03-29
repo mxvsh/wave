@@ -1,0 +1,41 @@
+---
+import LogoMark from "./LogoMark.astro";
+import { site } from "../data/site";
+---
+
+<footer class="relative z-10 border-t border-white/7 px-6 py-8">
+  <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4">
+    <a
+      href="/"
+      class="flex items-center gap-2 text-[15px] font-semibold text-slate-400 opacity-70 transition-opacity hover:opacity-100 no-underline"
+    >
+      <LogoMark size={22} />
+      <span>{site.name}</span>
+    </a>
+
+    <p class="text-[13px] text-slate-600">
+      © 2026 Wave. Made with care for macOS.
+    </p>
+
+    <ul class="flex list-none gap-5">
+      <li>
+        <a
+          href={site.githubUrl}
+          target="_blank"
+          rel="noreferrer"
+          class="text-[13px] text-slate-600 transition-colors hover:text-slate-400 no-underline"
+        >
+          GitHub
+        </a>
+      </li>
+      <li>
+        <a
+          href={site.releaseUrl}
+          class="text-[13px] text-slate-600 transition-colors hover:text-slate-400 no-underline"
+        >
+          Releases
+        </a>
+      </li>
+    </ul>
+  </div>
+</footer>

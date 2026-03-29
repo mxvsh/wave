@@ -1,0 +1,66 @@
+---
+import "../styles.css";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
+import { site } from "../data/site";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = site.title,
+  description = site.description,
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen overflow-x-hidden bg-[var(--color-deep)] font-sans text-[var(--color-text)] antialiased">
+    <div class="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+      <div class="animate-drift-1 absolute -left-28 -top-40 h-[560px] w-[560px] rounded-full bg-[var(--color-accent)] opacity-[0.12] blur-[80px]"></div>
+      <div class="animate-drift-2 absolute right-[-11rem] top-[40%] h-[480px] w-[480px] rounded-full bg-[var(--color-accent-2)] opacity-[0.12] blur-[80px]"></div>
+      <div class="animate-drift-3 absolute bottom-[10%] left-[25%] h-[360px] w-[360px] rounded-full bg-blue-500 opacity-[0.07] blur-[80px]"></div>
+    </div>
+
+    <Navbar />
+    <main class="relative z-10">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("in");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
+      );
+
+      document.querySelectorAll(".reveal").forEach((element) => {
+        observer.observe(element);
+      });
+    </script>
+  </body>
+</html>

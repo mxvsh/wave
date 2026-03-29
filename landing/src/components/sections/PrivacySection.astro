@@ -1,0 +1,75 @@
+---
+import SectionHeading from "../SectionHeading.astro";
+
+const cards = [
+  {
+    title: "Local Whisper",
+    description:
+      "OpenAI Whisper runs entirely on your Mac. Audio is processed in memory, never stored, and never sent anywhere.",
+    color: "bg-[color:rgba(52,211,153,0.15)]",
+    stroke: "#34D399",
+    delay: "",
+    wide: false,
+    icon: "shield",
+  },
+  {
+    title: "Groq option",
+    description:
+      "When speed matters more, switch to Groq's API for near-instant transcription. You supply your own API key.",
+    color: "bg-[color:rgba(79,142,247,0.15)]",
+    stroke: "#4F8EF7",
+    delay: "delay-1",
+    wide: false,
+    icon: "bolt",
+  },
+  {
+    title: "No account. No telemetry. No nonsense.",
+    description:
+      "Wave collects zero user data. No analytics trackers, no crash reporters, and no usage metrics phoning home.",
+    color: "bg-[color:rgba(123,110,246,0.15)]",
+    stroke: "#7B6EF6",
+    delay: "delay-2",
+    wide: true,
+    icon: "lock",
+  },
+] as const;
+---
+
+<section class="relative z-10 px-6 py-24" id="privacy">
+  <div class="mx-auto max-w-5xl">
+    <SectionHeading
+      eyebrow="Privacy"
+      title="Your voice stays yours"
+      description="Wave was designed with privacy as the foundation, not as a feature."
+    />
+
+    <div class="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {cards.map((card) => (
+        <div
+          class:list={[
+            "reveal glass cursor-default rounded-2xl p-7 transition-all duration-200 hover:-translate-y-0.5 hover:border-white/14",
+            card.delay,
+            card.wide && "sm:col-span-2 sm:flex sm:flex-row sm:items-center sm:gap-6",
+          ]}
+        >
+          <div class:list={["mb-5 flex h-12 w-12 items-center justify-center rounded-[14px] shrink-0", card.color, card.wide && "sm:mb-0"]}>
+            {card.icon === "shield" && (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={card.stroke} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            )}
+            {card.icon === "bolt" && (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={card.stroke} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            )}
+            {card.icon === "lock" && (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={card.stroke} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            )}
+          </div>
+
+          <div>
+            <h3 class="mb-2 text-[16px] font-semibold">{card.title}</h3>
+            <p class="text-[14px] leading-relaxed text-slate-400">{card.description}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
