@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.2](https://github.com/mxvsh/wave/compare/v0.3.1...v0.3.2) (2026-03-29)
+
+### Bug Fixes
+
+* remove PhosphorSwift, use SF Symbols to reduce binary size ([6d67ff2](https://github.com/mxvsh/wave/commit/6d67ff2e33e5929a75cb34599242229e9e4b7a48))
+
 ## [0.3.1](https://github.com/mxvsh/wave/compare/v0.3.0...v0.3.1) (2026-03-29)
 
 ## [0.3.0](https://github.com/mxvsh/wave/compare/v0.2.12...v0.3.0) (2026-03-29)
