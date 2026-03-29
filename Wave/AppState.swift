@@ -6,6 +6,11 @@ enum DictationMode: String, CaseIterable {
     case toggle = "Toggle"
 }
 
+enum TranscriptionProvider: String {
+    case local = "local"
+    case groq = "groq"
+}
+
 enum AppStatus: Equatable {
     case idle
     case recording
@@ -42,12 +47,34 @@ final class AppState {
     var customVocabulary: [String] {
         didSet { UserDefaults.standard.set(customVocabulary, forKey: "customVocabulary") }
     }
+    var transcriptionProvider: TranscriptionProvider {
+        didSet {
+            UserDefaults.standard.set(transcriptionProvider.rawValue, forKey: "transcriptionProvider")
+            if transcriptionProvider == .groq {
+                transcriptionService.unloadModel()
+                isModelLoaded = false
+            }
+        }
+    }
+    var groqAPIKey: String {
+        didSet { UserDefaults.standard.set(groqAPIKey, forKey: "groqAPIKey") }
+    }
+    var groqModel: String {
+        didSet { UserDefaults.standard.set(groqModel, forKey: "groqModel") }
+    }
 
     // MARK: - Services
     let modelManager = ModelManager()
     let transcriptionService = TranscriptionService()
     let hotkeyService = HotkeyService()
     var isModelLoaded = false   // tracked by @Observable — TranscriptionService is not
+
+    var isReady: Bool {
+        switch transcriptionProvider {
+        case .local: return isModelLoaded
+        case .groq: return !groqAPIKey.isEmpty
+        }
+    }
 
     // MARK: - Overlay
     var overlayPanel: OverlayPanel?
@@ -74,11 +101,14 @@ final class AppState {
         }
         muteSystemAudio = UserDefaults.standard.bool(forKey: "muteSystemAudio")
         customVocabulary = UserDefaults.standard.stringArray(forKey: "customVocabulary") ?? []
+        transcriptionProvider = TranscriptionProvider(rawValue: UserDefaults.standard.string(forKey: "transcriptionProvider") ?? "") ?? .local
+        groqAPIKey = UserDefaults.standard.string(forKey: "groqAPIKey") ?? ""
+        groqModel = UserDefaults.standard.string(forKey: "groqModel") ?? "whisper-large-v3-turbo"
 
-        // Default shortcut: Control + Space
+        // Default shortcut: Right Option
         if hotkeyKeyCode == 0 && hotkeyModifiers == 0 {
-            hotkeyKeyCode = 49 // kVK_Space
-            hotkeyModifiers = CGEventFlags.maskControl.rawValue
+            hotkeyKeyCode = 61 // kVK_RightOption
+            hotkeyModifiers = CGEventFlags.maskAlternate.rawValue
         }
 
         if !isOnboardingComplete {
@@ -128,8 +158,8 @@ final class AppState {
     }
 
     func startDictation() async {
-        guard isModelLoaded else {
-            status = .error("No model loaded")
+        guard isReady else {
+            status = .error(transcriptionProvider == .groq ? "Groq API key required" : "No model loaded")
             try? await Task.sleep(for: .seconds(2))
             status = .idle
             return
@@ -154,7 +184,18 @@ final class AppState {
         updateOverlay()
 
         let prompt = customVocabulary.isEmpty ? nil : customVocabulary.joined(separator: ", ")
-        let text = await transcriptionService.stopRecordingAndTranscribe(includePunctuation: includePunctuation, initialPrompt: prompt)
+        let text: String?
+        switch transcriptionProvider {
+        case .local:
+            text = await transcriptionService.stopRecordingAndTranscribe(includePunctuation: includePunctuation, initialPrompt: prompt)
+        case .groq:
+            text = await transcriptionService.stopRecordingAndTranscribeWithGroq(
+                apiKey: groqAPIKey,
+                model: groqModel,
+                includePunctuation: includePunctuation,
+                initialPrompt: prompt
+            )
+        }
         if muteSystemAudio { SystemAudioDucker.restore() }
 
         hideOverlay()
