@@ -1,5 +1,6 @@
 ---
 import "../styles.css";
+import DownloadModal from "../components/DownloadModal.astro";
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
 import { site } from "../data/site";
@@ -44,6 +45,7 @@ const {
       <slot />
     </main>
     <Footer />
+    <DownloadModal />
 
     <script>
       const observer = new IntersectionObserver(

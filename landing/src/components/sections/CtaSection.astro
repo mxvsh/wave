@@ -21,13 +21,14 @@ import { site } from "../../data/site";
       </p>
 
       <div class="relative mb-6 flex flex-wrap items-center justify-center gap-3">
-        <a
-          href={site.ctaPrimary.href}
+        <button
+          type="button"
+          data-download-trigger
           class="inline-flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-7 py-3.5 text-[15px] font-semibold text-white shadow-accent-glow transition-all duration-150 hover:-translate-y-0.5 hover:shadow-accent-glow-lg active:scale-[0.97] no-underline"
         >
           <ArrowDownToLine size={18} stroke-width={2.2} aria-hidden="true" />
           {site.ctaPrimary.label}
-        </a>
+        </button>
         <a
           href={site.githubUrl}
           target="_blank"

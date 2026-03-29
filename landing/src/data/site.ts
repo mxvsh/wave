@@ -1,5 +1,7 @@
 export const site = {
   name: "Wave",
+  repoOwner: "mxvsh",
+  repoName: "wave",
   title: "Wave - The right option for your every word",
   description:
     "A native macOS dictation app that turns your voice into text instantly. Local Whisper for complete privacy, or Groq for ultra-fast transcription.",

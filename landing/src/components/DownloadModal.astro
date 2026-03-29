@@ -1,0 +1,147 @@
+---
+import { ArrowDownToLine, CircleAlert, ShieldAlert, X } from "@lucide/astro";
+import { site } from "../data/site";
+---
+
+<div
+  class="download-modal fixed inset-0 z-[100] hidden items-center justify-center p-5"
+  data-download-modal
+  aria-hidden="true"
+>
+  <div class="download-modal-backdrop absolute inset-0 bg-black/70 backdrop-blur-md" data-download-close></div>
+
+  <div class="download-modal-panel glass relative z-10 w-full max-w-xl rounded-[28px] p-7 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+    <button
+      type="button"
+      class="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-400 transition-colors hover:text-white"
+      aria-label="Close download dialog"
+      data-download-close
+    >
+      <X size={18} aria-hidden="true" />
+    </button>
+
+    <div class="max-w-[30rem]">
+      <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-accent)]">Download Wave</p>
+      <h2 class="mt-3 text-[clamp(28px,4vw,40px)] font-bold leading-[1.08] tracking-[-0.03em] text-white">
+        Download for macOS
+      </h2>
+    </div>
+
+    <div class="mt-5 rounded-2xl border border-[rgba(251,191,36,0.18)] bg-[rgba(251,191,36,0.07)] p-5">
+      <div class="flex items-start gap-3">
+        <div class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[rgba(251,191,36,0.12)] text-amber-300">
+          <ShieldAlert size={18} aria-hidden="true" />
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-white">Unsigned app note</p>
+          <p class="mt-2 text-sm leading-relaxed text-slate-300">
+            Wave is not signed with an Apple Developer account yet. If macOS blocks the app, open
+            <span class="font-semibold text-white"> System Settings → Privacy &amp; Security </span>
+            and choose
+            <span class="font-semibold text-white"> Open Anyway </span>
+            after your first launch attempt.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 flex flex-wrap items-center gap-3">
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-6 py-3 text-[15px] font-semibold text-white shadow-accent-glow transition-all duration-150 hover:-translate-y-0.5 hover:shadow-accent-glow-lg disabled:cursor-not-allowed disabled:opacity-60"
+        data-download-action
+        disabled
+      >
+        <ArrowDownToLine size={18} stroke-width={2.2} aria-hidden="true" />
+        Download
+      </button>
+      <a
+        href={site.githubUrl + "/releases/latest"}
+        target="_blank"
+        rel="noreferrer"
+        class="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-[15px] font-medium text-slate-300 transition-colors hover:text-white no-underline"
+      >
+        View release page
+      </a>
+    </div>
+
+    <p class="mt-4 hidden items-center gap-2 text-sm text-rose-300" data-download-error>
+      <CircleAlert size={16} aria-hidden="true" />
+      Could not find a `.dmg` asset on the latest release.
+    </p>
+  </div>
+</div>
+
+<script define:vars={{ repoOwner: site.repoOwner, repoName: site.repoName }}>
+  const modal = document.querySelector("[data-download-modal]");
+  const openButtons = document.querySelectorAll("[data-download-trigger]");
+  const closeButtons = document.querySelectorAll("[data-download-close]");
+  const action = modal?.querySelector("[data-download-action]");
+  const error = modal?.querySelector("[data-download-error]");
+
+  let downloadUrl = "";
+  let hasLoaded = false;
+
+  const setOpen = (isOpen) => {
+    if (!(modal instanceof HTMLElement)) return;
+    modal.classList.toggle("hidden", !isOpen);
+    modal.classList.toggle("flex", isOpen);
+    modal.setAttribute("aria-hidden", String(!isOpen));
+    document.body.classList.toggle("overflow-hidden", isOpen);
+  };
+
+  const setLoading = (loading) => {
+    if (!(action instanceof HTMLButtonElement)) return;
+    action.disabled = loading || !downloadUrl;
+  };
+
+  const loadLatestRelease = async () => {
+    if (hasLoaded) return;
+    setLoading(true);
+
+    try {
+      const response = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/releases/latest`);
+      const data = await response.json();
+      const asset = Array.isArray(data.assets)
+        ? data.assets.find((item) => typeof item.name === "string" && item.name.toLowerCase().endsWith(".dmg"))
+        : null;
+
+      if (!asset?.browser_download_url) {
+        throw new Error("No DMG asset");
+      }
+
+      downloadUrl = asset.browser_download_url;
+      hasLoaded = true;
+      if (error instanceof HTMLElement) error.classList.add("hidden");
+      if (action instanceof HTMLButtonElement) action.disabled = false;
+    } catch {
+      if (error instanceof HTMLElement) error.classList.remove("hidden");
+      if (action instanceof HTMLButtonElement) action.disabled = true;
+    } finally {
+      if (!downloadUrl) {
+        setLoading(false);
+      }
+    }
+  };
+
+  openButtons.forEach((button) => {
+    button.addEventListener("click", async () => {
+      setOpen(true);
+      await loadLatestRelease();
+    });
+  });
+
+  closeButtons.forEach((button) => {
+    button.addEventListener("click", () => setOpen(false));
+  });
+
+  action?.addEventListener("click", () => {
+    if (downloadUrl) {
+      window.location.href = downloadUrl;
+    }
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") setOpen(false);
+  });
+</script>

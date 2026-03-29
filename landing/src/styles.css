@@ -203,6 +203,22 @@ body {
   -webkit-backdrop-filter: blur(18px);
 }
 
+.download-modal .download-spinner {
+  height: 1rem;
+  width: 1rem;
+  animation: spin 1s linear infinite;
+  color: var(--color-accent);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .faq-item summary::-webkit-details-marker {
   display: none;
 }

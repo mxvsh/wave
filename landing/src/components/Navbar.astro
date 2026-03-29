@@ -43,12 +43,13 @@ import { site } from "../data/site";
     </ul>
 
     <div class="flex min-w-[6rem] justify-end">
-      <a
-        href={site.downloadUrl}
+      <button
+        type="button"
+        data-download-trigger
         class="rounded-full bg-[var(--color-accent)] px-5 py-2 text-sm font-semibold whitespace-nowrap text-white shadow-accent-glow transition-all duration-150 hover:opacity-90 active:scale-95 no-underline"
       >
         Download
-      </a>
+      </button>
     </div>
   </div>
 </nav>
