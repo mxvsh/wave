@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.3.0](https://github.com/mxvsh/wave/compare/v0.2.12...v0.3.0) (2026-03-30)
+
+### Features
+
+* AI Mode with separate shortcut, colored wave overlay, and LLM response via Groq
+* Snippets — save reusable text snippets with name and value; AI Mode is aware of them
+* Groq cloud transcription with API key verification and model fetching
+* Language selection for transcription (auto-detect or ISO 639-1)
+* Sidebar redesign using NavigationSplitView with Settings and Help sections
+* LLM model picker with pricing table
+* LLM system prompt customizable in Models settings
+* Recent transcriptions in menu bar (up to 7, click to copy)
+* Dictation history limited to 10 most recent on home page
+* About and How to Use pages in sidebar
+* Brand accent color (#7b6ef6) applied app-wide
+
+### Bug Fixes
+
+* Cmd+Z and Cmd+A now work correctly in text fields
+* Left vs Right modifier keys correctly distinguished in shortcut detection
+* Shortcut recorder saves combo on key press, confirmed with Enter
+* App size reduced by removing PhosphorSwift bundle (84MB)
 
 ## [0.2.12](https://github.com/mxvsh/wave/compare/v0.2.11...v0.2.12) (2026-03-19)
 
