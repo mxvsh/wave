@@ -1,0 +1,148 @@
+---
+import { BadgeDollarSign, Brain, Mic, Zap } from "@lucide/astro";
+import SectionHeading from "../SectionHeading.astro";
+
+const llmModels = [
+  {
+    name: "GPT OSS 20B 128k",
+    tps: "1,000 TPS",
+    input: "$0.075",
+    inputNote: "(13.3M / $1)*",
+    output: "$0.30",
+    outputNote: "(3.33M / $1)*",
+  },
+  {
+    name: "GPT OSS Safeguard 20B",
+    tps: "1,000 TPS",
+    input: "$0.075",
+    inputNote: "(13.3M / $1)*",
+    output: "$0.30",
+    outputNote: "(3.33M / $1)*",
+  },
+  {
+    name: "Kimi K2-0905 1T 256k",
+    tps: "200 TPS",
+    input: "$1.00",
+    inputNote: "(1M / $1)*",
+    output: "$3.00",
+    outputNote: "(333,333 / $1)*",
+  },
+  {
+    name: "Llama 4 Scout 128k",
+    tps: "594 TPS",
+    input: "$0.11",
+    inputNote: "(9.09M / $1)*",
+    output: "$0.34",
+    outputNote: "(2.94M / $1)*",
+  },
+] as const;
+
+const speechModels = [
+  {
+    name: "Whisper Large V3 Turbo",
+    price: "$0.04",
+    unit: "per hour",
+  },
+  {
+    name: "Whisper Large V3",
+    price: "$0.111",
+    unit: "per hour",
+  },
+] as const;
+---
+
+<section class="relative z-10 px-6 py-24" id="pricing">
+  <div class="mx-auto max-w-5xl">
+    <SectionHeading
+      eyebrow="Pricing"
+      title="Start local, pay only for API usage"
+      description="Run Wave locally for free, or plug in Groq when you want hosted speech or LLM processing at low cost."
+    />
+
+    <div class="mt-12 grid grid-cols-1 gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+      <div class="reveal glass rounded-3xl p-7">
+        <div class="mb-6 flex items-center gap-3">
+          <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[color:rgba(123,110,246,0.15)] text-[var(--color-accent)]">
+            <Brain size={20} aria-hidden="true" />
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-white">Groq LLM pricing</p>
+            <p class="text-sm text-slate-400">Useful when AI mode rewrites spoken intent into final text.</p>
+          </div>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          {llmModels.map((model, index) => (
+            <div class:list={["rounded-2xl border border-white/8 bg-white/4 p-5", index % 2 === 1 && "delay-1"]}>
+                <div class="mb-4 flex items-start justify-between gap-3">
+                  <div>
+                    <h3 class="text-[15px] font-semibold text-white">{model.name}</h3>
+                    <p class="mt-1 text-xs uppercase tracking-[0.12em] text-slate-500">{model.tps}</p>
+                  </div>
+                  <Zap size={17} class="text-[var(--color-accent-2)]" aria-hidden="true" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <p class="text-xs uppercase tracking-[0.12em] text-slate-500">Input</p>
+                    <p class="mt-2 text-2xl font-semibold text-white">{model.input}</p>
+                    <p class="mt-1 text-xs text-slate-500">{model.inputNote}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs uppercase tracking-[0.12em] text-slate-500">Output</p>
+                    <p class="mt-2 text-2xl font-semibold text-white">{model.output}</p>
+                    <p class="mt-1 text-xs text-slate-500">{model.outputNote}</p>
+                  </div>
+                </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div class="reveal delay-1 glass rounded-3xl p-7">
+          <div class="mb-5 flex items-center gap-3">
+            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[color:rgba(52,211,153,0.15)] text-emerald-400">
+              <BadgeDollarSign size={20} aria-hidden="true" />
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-white">Run locally</p>
+              <p class="text-sm text-slate-400">Whisper on your Mac</p>
+            </div>
+          </div>
+
+          <p class="text-4xl font-semibold tracking-[-0.03em] text-white">$0</p>
+          <p class="mt-2 text-sm leading-relaxed text-slate-400">
+            No API bill when you run transcription locally. Bring your own hardware and keep the workflow private.
+          </p>
+        </div>
+
+        <div class="reveal delay-2 glass rounded-3xl p-7">
+          <div class="mb-5 flex items-center gap-3">
+            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[color:rgba(79,142,247,0.15)] text-[var(--color-accent-2)]">
+              <Mic size={20} aria-hidden="true" />
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-white">Groq speech-to-text</p>
+              <p class="text-sm text-slate-400">Very cheap hosted transcription</p>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            {speechModels.map((model) => (
+              <div class="rounded-2xl border border-white/8 bg-white/4 p-4">
+                <div class="flex items-end justify-between gap-3">
+                  <div>
+                    <p class="text-sm font-medium text-white">{model.name}</p>
+                    <p class="mt-1 text-xs uppercase tracking-[0.12em] text-slate-500">{model.unit}</p>
+                  </div>
+                  <p class="text-2xl font-semibold text-white">{model.price}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
