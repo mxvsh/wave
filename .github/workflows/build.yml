@@ -46,7 +46,12 @@ jobs:
             MARKETING_VERSION="${{ steps.version.outputs.marketing_version }}" \
             CURRENT_PROJECT_VERSION="${{ steps.version.outputs.marketing_version }}" \
             CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO
+            CODE_SIGNING_REQUIRED=NO \
+            STRIP_INSTALLED_PRODUCT=YES \
+            DEAD_CODE_STRIPPING=YES \
+            DEBUG_INFORMATION_FORMAT=dwarf-with-dsym \
+            SWIFT_OPTIMIZATION_LEVEL=-Osize \
+            SWIFT_COMPILATION_MODE=wholemodule
 
       - name: Ad-hoc sign
         run: codesign --force --deep --sign - build/Build/Products/Release/Wave.app

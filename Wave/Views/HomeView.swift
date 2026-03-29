@@ -16,14 +16,14 @@ enum NavItem: String, Hashable {
     @ViewBuilder
     var icon: some View {
         switch self {
-        case .home:      Ph.house.regular.frame(width: 16, height: 16)
+        case .home:       Ph.house.regular.frame(width: 16, height: 16)
         case .dictionary: Ph.bookOpen.regular.frame(width: 16, height: 16)
-        case .snippets:  Ph.textT.regular.frame(width: 16, height: 16)
-        case .general:   Ph.slidersHorizontal.regular.frame(width: 16, height: 16)
-        case .shortcut:  Ph.keyboard.regular.frame(width: 16, height: 16)
-        case .models:    Ph.cpu.regular.frame(width: 16, height: 16)
-        case .howToUse:  Ph.bookOpenText.regular.frame(width: 16, height: 16)
-        case .about:     Ph.info.regular.frame(width: 16, height: 16)
+        case .snippets:   Ph.textT.regular.frame(width: 16, height: 16)
+        case .general:    Ph.slidersHorizontal.regular.frame(width: 16, height: 16)
+        case .shortcut:   Ph.keyboard.regular.frame(width: 16, height: 16)
+        case .models:     Ph.cpu.regular.frame(width: 16, height: 16)
+        case .howToUse:   Ph.bookOpenText.regular.frame(width: 16, height: 16)
+        case .about:      Ph.info.regular.frame(width: 16, height: 16)
         }
     }
 }
