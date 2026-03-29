@@ -41,6 +41,23 @@ struct WaveApp: App {
 
             Divider()
 
+            Menu("Recent Transcriptions") {
+                if appState.historyManager.records.isEmpty {
+                    Text("No transcriptions yet")
+                } else {
+                    ForEach(appState.historyManager.records.prefix(7)) { record in
+                        Button {
+                            NSPasteboard.general.clearContents()
+                            NSPasteboard.general.setString(record.text, forType: .string)
+                        } label: {
+                            Text(record.text.count > 40 ? String(record.text.prefix(40)) + "…" : record.text)
+                        }
+                    }
+                }
+            }
+
+            Divider()
+
             Button("Check for Updates...") {
                 UpdaterService.shared.checkForUpdates()
             }
