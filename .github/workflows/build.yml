@@ -51,7 +51,8 @@ jobs:
             DEAD_CODE_STRIPPING=YES \
             DEBUG_INFORMATION_FORMAT=dwarf-with-dsym \
             SWIFT_OPTIMIZATION_LEVEL=-Osize \
-            SWIFT_COMPILATION_MODE=wholemodule
+            SWIFT_COMPILATION_MODE=wholemodule \
+            ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES=NO
 
       - name: Debug app size
         run: |
