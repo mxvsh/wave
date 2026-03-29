@@ -14,6 +14,9 @@ const {
   title = site.title,
   description = site.description,
 } = Astro.props;
+
+const canonicalUrl = new URL(Astro.url.pathname, site.siteUrl).toString();
+const ogImageUrl = new URL(site.ogImage, site.siteUrl).toString();
 ---
 
 <!DOCTYPE html>
@@ -31,6 +34,19 @@ const {
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
     <title>{title}</title>
   </head>
   <body class="min-h-screen overflow-x-hidden bg-[var(--color-deep)] font-sans text-[var(--color-text)] antialiased">

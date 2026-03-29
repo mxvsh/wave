@@ -88,7 +88,7 @@ private struct TranscriptionRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(record.text)
                     .font(.system(size: 12))
-                    .lineLimit(2)
+                    .lineLimit(3)
                 Text(timeLabel)
                     .font(.system(size: 10))
                     .foregroundStyle(.tertiary)

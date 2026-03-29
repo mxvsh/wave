@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 extension Color {
-    static let brand = Color(red: 0x95 / 255, green: 0x8B / 255, blue: 0xF9 / 255)
+    static let brand = Color(red: 0x7B / 255, green: 0x6E / 255, blue: 0xF6 / 255)
 }
 
 // Configures the NSWindow: transparent titlebar, traffic lights, no title text,

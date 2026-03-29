@@ -1,0 +1,481 @@
+---
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wave — OG Banner</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        background: #111318;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        padding: 2rem;
+        font-family: "Inter", system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .toolbar-label {
+        font-size: 13px;
+        color: rgba(148,163,184,0.7);
+        letter-spacing: 0.04em;
+      }
+
+      .download-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #7b6ef6;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 0.55rem 1.1rem;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.15s;
+      }
+      .download-btn:hover { opacity: 0.85; }
+      .download-btn:active { opacity: 0.7; }
+      .download-btn svg { width: 14px; height: 14px; }
+
+      /* Scale wrapper — keeps banner at natural size for html2canvas, scales it visually */
+      .banner-outer {
+        width: 100%;
+        max-width: min(1200px, 100%);
+        overflow: hidden;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.08);
+        box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+      }
+
+      .banner-scale {
+        width: 1200px;
+        transform-origin: top left;
+      }
+
+      /* ── Banner ── */
+      #og-banner {
+        width: 1200px;
+        height: 630px;
+        background: #06070a;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        padding: 48px 80px;
+      }
+
+      /* Ambient glows */
+      .glow-1 {
+        position: absolute;
+        top: -120px;
+        right: -80px;
+        width: 520px;
+        height: 520px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(123,110,246,0.18) 0%, transparent 70%);
+        pointer-events: none;
+      }
+      .glow-2 {
+        position: absolute;
+        bottom: -100px;
+        left: -60px;
+        width: 480px;
+        height: 480px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(79,142,247,0.13) 0%, transparent 70%);
+        pointer-events: none;
+      }
+      .glow-3 {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 600px;
+        height: 300px;
+        border-radius: 50%;
+        background: radial-gradient(ellipse, rgba(123,110,246,0.07) 0%, transparent 70%);
+        pointer-events: none;
+      }
+
+      /* Subtle grid lines */
+      .grid-overlay {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+        background-size: 60px 60px;
+        pointer-events: none;
+      }
+
+      /* Top edge accent line */
+      .top-line {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent 0%, rgba(123,110,246,0.6) 50%, transparent 100%);
+      }
+
+      /* Content */
+      .banner-content {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+      }
+
+      /* Logo row */
+      .logo-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 28px;
+      }
+
+      .og-wave-word {
+        margin-bottom: 24px;
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #ffffff;
+      }
+
+      /* Headline */
+      .og-headline {
+        font-size: 34px;
+        font-weight: 700;
+        color: #ededef;
+        letter-spacing: -0.025em;
+        line-height: 1.15;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+
+      .og-headline span {
+        background: linear-gradient(135deg, #7b6ef6 0%, #4f8ef7 60%, #a78bfa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .og-sub {
+        font-size: 16px;
+        color: rgba(148,163,184,0.8);
+        letter-spacing: -0.01em;
+        margin-bottom: 0;
+      }
+
+      /* Cards */
+      .og-cards {
+        display: flex;
+        gap: 16px;
+        margin-top: 28px;
+        width: 860px;
+      }
+
+      .og-card {
+        flex: 1;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 20px;
+        padding: 20px 22px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+      }
+
+      .og-card-visual {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 52px;
+      }
+
+      /* Key */
+      .og-key {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        border: 1px solid rgba(123,110,246,0.5);
+        background: linear-gradient(180deg, rgba(20,22,28,0.95), rgba(9,10,13,0.98));
+        box-shadow: 0 0 20px rgba(123,110,246,0.2), inset 0 1px 0 rgba(255,255,255,0.06);
+      }
+      .og-key-symbol {
+        font-size: 20px;
+        line-height: 1;
+        color: #dcd7ff;
+        font-weight: 300;
+      }
+      .og-key-word {
+        font-size: 8px;
+        font-weight: 500;
+        text-transform: lowercase;
+        color: rgba(220,215,255,0.5);
+        letter-spacing: 0.02em;
+      }
+
+      /* Mini waveform */
+      .og-mini-wave {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        height: 36px;
+      }
+      .og-mbar {
+        display: block;
+        width: 3px;
+        border-radius: 2px;
+        background: linear-gradient(180deg, rgba(123,110,246,0.9), rgba(79,142,247,0.55));
+      }
+
+      /* Cursor box */
+      .og-cursor-box {
+        border: 1px solid rgba(255,255,255,0.08);
+        background: rgba(255,255,255,0.03);
+        border-radius: 8px;
+        padding: 7px 12px;
+      }
+      .og-cursor-text {
+        font-size: 11px;
+        color: rgba(148,163,184,0.5);
+      }
+      .og-cursor {
+        color: #7b6ef6;
+        font-weight: 300;
+        margin-left: 1px;
+      }
+
+      .og-card-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #ededef;
+        letter-spacing: -0.01em;
+      }
+
+      .og-card-desc {
+        font-size: 12px;
+        color: rgba(148,163,184,0.6);
+        line-height: 1.5;
+      }
+
+      /* Bottom bar */
+      .og-bottom {
+        position: absolute;
+        bottom: 28px;
+        left: 0;
+        right: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        z-index: 10;
+      }
+
+      .og-macos-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.05);
+        padding: 4px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        color: rgba(148,163,184,0.7);
+        letter-spacing: 0.02em;
+      }
+
+      .og-dot {
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.15);
+      }
+
+      .og-bottom-text {
+        font-size: 13px;
+        color: rgba(100,116,139,0.8);
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="toolbar">
+      <span class="toolbar-label">1200 × 630 · Open Graph Banner</span>
+      <button class="download-btn" id="download-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download PNG
+      </button>
+    </div>
+
+    <div class="banner-outer">
+      <div class="banner-scale" id="banner-scale">
+
+        <div id="og-banner">
+          <div class="glow-1"></div>
+          <div class="glow-2"></div>
+          <div class="glow-3"></div>
+          <div class="grid-overlay"></div>
+          <div class="top-line"></div>
+
+          <div class="banner-content">
+
+            <!-- Logo -->
+            <div class="logo-row">
+              <img src="/logo.svg" alt="Wave" width="80" height="37" style="opacity:0.9" />
+            </div>
+
+            <!-- Headline -->
+            <h1 class="og-headline">
+              Your voice, typed instantly.<br />
+              <span>Anywhere on your Mac.</span>
+            </h1>
+            <p class="og-sub">Native dictation with local Whisper or Groq. No accounts. No friction.</p>
+
+            <!-- 3 step cards -->
+            <div class="og-cards">
+
+              <div class="og-card">
+                <div class="og-card-visual">
+                  <div class="og-key">
+                    <span class="og-key-symbol">⌥</span>
+                    <span class="og-key-word">option</span>
+                  </div>
+                </div>
+                <p class="og-card-title">Hold Right Option</p>
+                <p class="og-card-desc">Any app, any screen. No window to open.</p>
+              </div>
+
+              <div class="og-card">
+                <div class="og-card-visual">
+                  <div class="og-mini-wave">
+                    <span class="og-mbar" style="height:30%"></span>
+                    <span class="og-mbar" style="height:60%"></span>
+                    <span class="og-mbar" style="height:88%"></span>
+                    <span class="og-mbar" style="height:50%"></span>
+                    <span class="og-mbar" style="height:100%"></span>
+                    <span class="og-mbar" style="height:72%"></span>
+                    <span class="og-mbar" style="height:90%"></span>
+                    <span class="og-mbar" style="height:44%"></span>
+                    <span class="og-mbar" style="height:65%"></span>
+                  </div>
+                </div>
+                <p class="og-card-title">Say it out loud</p>
+                <p class="og-card-desc">Speak naturally. Wave listens in real time.</p>
+              </div>
+
+              <div class="og-card">
+                <div class="og-card-visual">
+                  <div class="og-cursor-box">
+                    <span class="og-cursor-text">your words appear here</span><span class="og-cursor">|</span>
+                  </div>
+                </div>
+                <p class="og-card-title">Release to insert</p>
+                <p class="og-card-desc">Text appears at your cursor, instantly.</p>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Bottom macOS badge -->
+          <div class="og-bottom">
+            <span class="og-macos-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:rgba(148,163,184,0.6)"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+              macOS
+            </span>
+            <span class="og-bottom-text">Free &amp; Open Source</span>
+            <span class="og-dot"></span>
+            <span class="og-bottom-text">Local Whisper · Groq · AI Mode</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+      // Scale banner to fit container
+      function scaleBanner() {
+        const outer = document.querySelector(".banner-outer");
+        const scale = document.getElementById("banner-scale");
+        if (!outer || !scale) return;
+        const ratio = outer.clientWidth / 1200;
+        scale.style.transform = `scale(${ratio})`;
+        scale.style.height = `${630 * ratio}px`;
+        outer.style.height = `${630 * ratio}px`;
+      }
+      scaleBanner();
+      window.addEventListener("resize", scaleBanner);
+
+      // Download
+      document.getElementById("download-btn")?.addEventListener("click", async () => {
+        const btn = document.getElementById("download-btn");
+        if (btn) btn.textContent = "Generating…";
+
+        // Temporarily reset scale so html2canvas captures at full res
+        const scale = document.getElementById("banner-scale");
+        if (scale) {
+          scale.style.transform = "scale(1)";
+          scale.style.height = "630px";
+        }
+
+        await new Promise((r) => setTimeout(r, 60));
+
+        const banner = document.getElementById("og-banner");
+        if (!banner || typeof html2canvas === "undefined") return;
+
+        const canvas = await html2canvas(banner, {
+          width: 1200,
+          height: 630,
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#06070a",
+        });
+
+        const link = document.createElement("a");
+        link.download = "wave-og-banner.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+
+        // Restore scale
+        scaleBanner();
+        if (btn) {
+          btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download PNG`;
+        }
+      });
+    </script>
+
+  </body>
+</html>
