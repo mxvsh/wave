@@ -209,6 +209,14 @@ body {
   -webkit-backdrop-filter: blur(18px);
 }
 
+.how-it-works-trigger.is-active {
+  border-color: rgba(123, 110, 246, 0.4);
+  background: linear-gradient(180deg, rgba(123, 110, 246, 0.1), rgba(255, 255, 255, 0.04));
+  box-shadow:
+    0 0 0 1px rgba(123, 110, 246, 0.15),
+    0 14px 30px rgba(79, 142, 247, 0.08);
+}
+
 .download-modal .download-spinner {
   height: 1rem;
   width: 1rem;

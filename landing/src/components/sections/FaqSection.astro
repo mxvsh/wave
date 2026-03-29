@@ -34,12 +34,12 @@ const faqs = [
       description="The basics on pricing, privacy, and how local versus hosted usage works."
     />
 
-    <div class="mt-12 grid gap-4 md:grid-cols-2">
+    <div class="mt-12 grid gap-4">
       {faqs.map((item, index) => (
         <details
           class:list={[
             "reveal faq-item glass group rounded-2xl p-6",
-            index % 2 === 1 && "delay-1",
+            index > 0 && "delay-1",
           ]}
         >
           <summary class="flex cursor-pointer list-none items-start justify-between gap-4">
