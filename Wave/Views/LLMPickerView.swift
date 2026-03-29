@@ -131,7 +131,7 @@ struct LLMPickerView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
         .background(in: RoundedRectangle(cornerRadius: 8))
-        .backgroundStyle(isSelected ? AnyShapeStyle(.blue.opacity(0.08)) : AnyShapeStyle(.quaternary.opacity(0.5)))
-        .overlay(RoundedRectangle(cornerRadius: 8).stroke(isSelected ? Color.blue.opacity(0.2) : Color.clear, lineWidth: 1))
+        .backgroundStyle(isSelected ? AnyShapeStyle(Color.brand.opacity(0.08)) : AnyShapeStyle(.quaternary.opacity(0.5)))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(isSelected ? Color.brand.opacity(0.2) : Color.clear, lineWidth: 1))
     }
 }

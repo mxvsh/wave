@@ -22,6 +22,8 @@
     <string>0.2.12</string>
     <key>LSUIElement</key>
     <false/>
+    <key>NSAccentColorName</key>
+    <string>AccentColor</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>Wave needs microphone access to record speech for transcription.</string>
     <key>SUAutomaticallyUpdate</key>

@@ -61,8 +61,8 @@ struct GeneralSettingsView: View {
                             .font(.system(size: 12, weight: .semibold, design: .rounded))
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
-                            .background(.blue.opacity(0.15), in: RoundedRectangle(cornerRadius: 7))
-                            .foregroundStyle(.blue)
+                            .background(Color.brand.opacity(0.15), in: RoundedRectangle(cornerRadius: 7))
+                            .foregroundStyle(Color.brand)
                             .buttonStyle(.plain)
                             .disabled(appState.groqAPIKey.isEmpty || appState.groqAPIStatus == .checking)
                         }

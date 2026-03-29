@@ -32,7 +32,7 @@ Follow these rules consistently. Do not invent new patterns when an existing one
 **Backgrounds**
 - Card / row: `.quaternary.opacity(0.5)` with `RoundedRectangle(cornerRadius: 8)`
 - Standard button: `.quaternary` with `RoundedRectangle(cornerRadius: 6)`
-- Primary action button: `.blue.opacity(0.15)` background, `.blue` foreground, `RoundedRectangle(cornerRadius: 7)`
+- Primary action button: `Color.brand.opacity(0.15)` background, `Color.brand` foreground, `RoundedRectangle(cornerRadius: 7)`. Brand color is `#958BF9`, defined as `Color.brand` in `Color+Brand.swift` — always use `Color.brand`, never `.blue`.
 
 **Buttons**
 - Always `.buttonStyle(.plain)`
