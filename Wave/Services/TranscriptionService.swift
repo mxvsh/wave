@@ -21,6 +21,10 @@ final class TranscriptionService: NSObject, AVAudioRecorderDelegate {
         whisperContext != nil
     }
 
+    func audioLevel() async -> Float {
+        await recorder.currentLevel()
+    }
+
     func startRecording() async throws {
         let granted = await PermissionService.requestMicrophoneAccess()
         guard granted else { throw RecordingError.microphonePermissionDenied }

@@ -17,10 +17,21 @@ actor AudioRecorder {
         ]
         let recorder = try AVAudioRecorder(url: url, settings: recordSettings)
         recorder.delegate = delegate
+        recorder.isMeteringEnabled = true
         if recorder.record() == false {
             throw RecorderError.couldNotStartRecording
         }
         self.recorder = recorder
+    }
+
+    func currentLevel() -> Float {
+        guard let recorder else { return 0 }
+        recorder.updateMeters()
+        // averagePower is in dB: -160 (silence) to 0 (max)
+        let db = recorder.averagePower(forChannel: 0)
+        let minDb: Float = -50
+        guard db > minDb else { return 0 }
+        return 1.0 - (db / minDb) // normalize to 0–1
     }
 
     func stopRecording() {

@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import Combine
 
 struct HomePageView: View {
     @Environment(AppState.self) private var appState
@@ -79,6 +80,8 @@ private struct TranscriptionRow: View {
     let record: TranscriptionRecord
     let onDelete: () -> Void
     @State private var isHovered = false
+    @State private var timeLabel: String = ""
+    private let timer = Timer.publish(every: 15, on: .main, in: .common).autoconnect()
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
@@ -86,9 +89,11 @@ private struct TranscriptionRow: View {
                 Text(record.text)
                     .font(.system(size: 12))
                     .lineLimit(2)
-                Text(record.date, style: .relative)
+                Text(timeLabel)
                     .font(.system(size: 10))
                     .foregroundStyle(.tertiary)
+                    .onAppear { timeLabel = relativeTime(record.date) }
+                    .onReceive(timer) { _ in timeLabel = relativeTime(record.date) }
             }
 
             Spacer(minLength: 4)
@@ -119,4 +124,12 @@ private struct TranscriptionRow: View {
         .contentShape(Rectangle())
         .onHover { isHovered = $0 }
     }
+}
+
+private func relativeTime(_ date: Date) -> String {
+    let seconds = Int(-date.timeIntervalSinceNow)
+    if seconds < 60 { return "just now" }
+    if seconds < 3600 { return "\(seconds / 60)m ago" }
+    if seconds < 86400 { return "\(seconds / 3600)h ago" }
+    return "\(seconds / 86400)d ago"
 }

@@ -127,6 +127,7 @@ final class AppState {
         Task {
             await loadSelectedModel()
             setupHotkey()
+            await MainActor.run { startPersistentOverlay() }
         }
     }
 
@@ -179,12 +180,21 @@ final class AppState {
             showOverlay()
             if muteSystemAudio { SystemAudioDucker.duck() }
             try await transcriptionService.startRecording()
+            // Poll mic level and drive overlay visualization
+            Task { [weak self] in
+                while let self, self.status == .recording {
+                    let level = await self.transcriptionService.audioLevel()
+                    self.overlayPanel?.setAudioLevel(level)
+                    try? await Task.sleep(for: .milliseconds(33))
+                }
+            }
         } catch {
             if muteSystemAudio { SystemAudioDucker.restore() }
             status = .error("Recording failed")
-            hideOverlay()
+            overlayPanel?.updateStatus(status)
             try? await Task.sleep(for: .seconds(2))
             status = .idle
+            overlayPanel?.updateStatus(.idle)
         }
     }
 
@@ -207,7 +217,8 @@ final class AppState {
         }
         if muteSystemAudio { SystemAudioDucker.restore() }
 
-        hideOverlay()
+        status = .idle
+        overlayPanel?.updateStatus(.idle)
 
         if let text = text, !text.isEmpty {
             print("[wave] pasting: '\(text)'")
@@ -241,14 +252,23 @@ final class AppState {
         if overlayPanel == nil {
             overlayPanel = OverlayPanel()
         }
-        overlayPanel?.showOverlay(status: status)
+        overlayPanel?.updateStatus(status)
     }
 
     func updateOverlay() {
-        overlayPanel?.showOverlay(status: status)
+        overlayPanel?.updateStatus(status)
     }
 
     func hideOverlay() {
-        overlayPanel?.hideOverlay()
+        // Return to idle pill — don't actually hide
+        status = .idle
+        overlayPanel?.updateStatus(.idle)
+    }
+
+    func startPersistentOverlay() {
+        if overlayPanel == nil {
+            overlayPanel = OverlayPanel()
+        }
+        overlayPanel?.updateStatus(.idle)
     }
 }
