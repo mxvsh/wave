@@ -125,6 +125,7 @@ final class AppState {
     let hotkeyService = HotkeyService()
     let aiHotkeyService = HotkeyService()
     let historyManager = HistoryManager()
+    let snippetManager = SnippetManager()
     let microphoneManager = MicrophoneManager()
     var isModelLoaded = false   // tracked by @Observable — TranscriptionService is not
     var isAIMode = false
@@ -346,7 +347,12 @@ final class AppState {
         let text: String?
         if isAIMode, let query = transcribed, !query.isEmpty, !groqAPIKey.isEmpty {
             print("[wave] sending to AI: '\(query)'")
-            let result = await transcriptionService.sendToAI(text: query, apiKey: groqAPIKey, model: aiModel, systemPrompt: llmSystemPrompt)
+            var fullPrompt = llmSystemPrompt
+            if !snippetManager.snippets.isEmpty {
+                let snippetLines = snippetManager.snippets.map { "- \($0.name): \($0.value)" }.joined(separator: "\n")
+                fullPrompt += "\n\nUser snippets (use when relevant):\n\(snippetLines)"
+            }
+            let result = await transcriptionService.sendToAI(text: query, apiKey: groqAPIKey, model: aiModel, systemPrompt: fullPrompt)
             usagePromptTokens += result.promptTokens
             usageCompletionTokens += result.completionTokens
             usageTotalTokens += result.totalTokens

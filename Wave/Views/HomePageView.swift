@@ -48,6 +48,12 @@ struct HomePageView: View {
                         }
                     }
                 }
+
+                Text("Right-click for more options")
+                    .font(.system(size: 10))
+                    .foregroundStyle(.quaternary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 6)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -79,7 +85,6 @@ private struct StatCard: View {
 private struct TranscriptionRow: View {
     let record: TranscriptionRecord
     let onDelete: () -> Void
-    @State private var isHovered = false
     @State private var timeLabel: String = ""
     private let timer = Timer.publish(every: 15, on: .main, in: .common).autoconnect()
 
@@ -95,34 +100,19 @@ private struct TranscriptionRow: View {
                     .onAppear { timeLabel = relativeTime(record.date) }
                     .onReceive(timer) { _ in timeLabel = relativeTime(record.date) }
             }
-
             Spacer(minLength: 4)
-
-            if isHovered {
-                HStack(spacing: 4) {
-                    Button(action: {
-                        NSPasteboard.general.clearContents()
-                        NSPasteboard.general.setString(record.text, forType: .string)
-                    }) {
-                        Image(systemName: "doc.on.doc")
-                            .font(.system(size: 11))
-                            .foregroundStyle(.secondary)
-                    }
-                    .buttonStyle(.plain)
-
-                    Button(action: onDelete) {
-                        Image(systemName: "trash")
-                            .font(.system(size: 11))
-                            .foregroundStyle(.red.opacity(0.7))
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
         .contentShape(Rectangle())
-        .onHover { isHovered = $0 }
+        .contextMenu {
+            Button("Copy") {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(record.text, forType: .string)
+            }
+            Divider()
+            Button("Delete", role: .destructive) { onDelete() }
+        }
     }
 }
 
