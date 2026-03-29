@@ -65,6 +65,8 @@ jobs:
           du -sh build/Build/Products/Release/Wave.app/Contents/MacOS/*
           echo "=== Plugins/XPC ==="
           du -sh build/Build/Products/Release/Wave.app/Contents/PlugIns/* 2>/dev/null || echo "No plugins"
+          echo "=== Resources (top level) ==="
+          du -sh build/Build/Products/Release/Wave.app/Contents/Resources/* 2>/dev/null | sort -rh | head -20
 
       - name: Ad-hoc sign
         run: codesign --force --deep --sign - build/Build/Products/Release/Wave.app
