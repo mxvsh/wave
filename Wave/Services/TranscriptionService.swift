@@ -118,6 +118,72 @@ final class TranscriptionService: NSObject, AVAudioRecorderDelegate {
         }
     }
 
+    struct AIResult {
+        let text: String?
+        let promptTokens: Int
+        let completionTokens: Int
+        let totalTokens: Int
+        let totalTime: Double
+    }
+
+    func sendToAI(text: String, apiKey: String, model: String, systemPrompt: String) async -> AIResult {
+        let url = URL(string: "https://api.groq.com/openai/v1/chat/completions")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = [
+            "model": model,
+            "messages": [
+                ["role": "system", "content": systemPrompt],
+                ["role": "user", "content": text]
+            ]
+        ]
+        guard let httpBody = try? JSONSerialization.data(withJSONObject: body) else {
+            return AIResult(text: nil, promptTokens: 0, completionTokens: 0, totalTokens: 0, totalTime: 0)
+        }
+        request.httpBody = httpBody
+
+        do {
+            let (data, _) = try await URLSession.shared.data(for: request)
+
+            struct Message: Decodable { let content: String }
+            struct Choice: Decodable { let message: Message }
+            struct Usage: Decodable {
+                let promptTokens: Int
+                let completionTokens: Int
+                let totalTokens: Int
+                let totalTime: Double
+                enum CodingKeys: String, CodingKey {
+                    case promptTokens = "prompt_tokens"
+                    case completionTokens = "completion_tokens"
+                    case totalTokens = "total_tokens"
+                    case totalTime = "total_time"
+                }
+            }
+            struct AIResponse: Decodable {
+                let choices: [Choice]
+                let usage: Usage?
+            }
+
+            let response = try JSONDecoder().decode(AIResponse.self, from: data)
+            let result = response.choices.first?.message.content
+            let usage = response.usage
+            print("[wave] AI response: '\(result ?? "nil")' tokens=\(usage?.totalTokens ?? 0)")
+            return AIResult(
+                text: result,
+                promptTokens: usage?.promptTokens ?? 0,
+                completionTokens: usage?.completionTokens ?? 0,
+                totalTokens: usage?.totalTokens ?? 0,
+                totalTime: usage?.totalTime ?? 0
+            )
+        } catch {
+            print("[wave] AI error: \(error)")
+            return AIResult(text: nil, promptTokens: 0, completionTokens: 0, totalTokens: 0, totalTime: 0)
+        }
+    }
+
     // MARK: - Helpers
 
     private static let noiseTokens: Set<String> = [

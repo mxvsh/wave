@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xcodebuild -scheme Wave -configuration Debug build)"
+      "Bash(xcodebuild -scheme Wave -configuration Debug build)",
+      "Bash(xcodebuild -scheme Wave -configuration Debug -destination 'platform=macOS' build)",
+      "Bash(grep -v \"^$\")"
     ]
   }
 }

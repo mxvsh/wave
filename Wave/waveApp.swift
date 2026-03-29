@@ -16,7 +16,6 @@ struct WaveApp: App {
         .defaultPosition(.center)
         .commands {
             CommandGroup(replacing: .newItem) {}
-            CommandGroup(replacing: .undoRedo) {}
             CommandGroup(replacing: .textFormatting) {}
             CommandGroup(replacing: .toolbar) {}
             CommandGroup(replacing: .windowSize) {}
@@ -85,7 +84,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // SwiftUI CommandGroup replacements leave empty menu headers on newer macOS.
         // Remove them directly via AppKit every time the app activates.
         guard let mainMenu = NSApp.mainMenu else { return }
-        let remove = ["Format", "View", "File", "Edit", "Window", "Help"]
+        let remove = ["Format", "View", "File", "Window", "Help"]
         for title in remove {
             if let item = mainMenu.items.first(where: { $0.title == title }) {
                 mainMenu.removeItem(item)

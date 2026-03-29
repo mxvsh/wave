@@ -21,10 +21,10 @@ struct ShortcutRecorderView: View {
             HStack(spacing: 6) {
                 if isRecording {
                     if let pk = pendingKeyCode, let pm = pendingModifiers {
-                        Text("\(KeyCodeMapping.displayString(keyCode: pk, modifiers: CGEventFlags(rawValue: pm)))  ·  Return to save")
-                            .foregroundStyle(.secondary)
+                        Text(KeyCodeMapping.displayString(keyCode: pk, modifiers: CGEventFlags(rawValue: pm)))
+                            .foregroundStyle(.primary)
                     } else {
-                        Text("Press shortcut...")
+                        Text("Press shortcut…")
                             .foregroundStyle(.secondary)
                     }
                 } else {
@@ -94,8 +94,9 @@ private final class ShortcutCaptureNSView: NSView {
     var onPending: ((UInt16, UInt64) -> Void)?
     var onCancel: (() -> Void)?
     private var monitor: Any?
-    private var pendingKeyCode: UInt16?
-    private var pendingModifiers: UInt64?
+    private var currentModifierFlags: UInt64 = 0
+    // Saved when modifiers are pressed so Enter can confirm even after keys are released
+    private var savedCombo: (keyCode: UInt16, flags: UInt64)?
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
@@ -105,39 +106,36 @@ private final class ShortcutCaptureNSView: NSView {
 
                 if event.type == .keyDown {
                     if event.keyCode == UInt16(kVK_Escape) {
-                        self.pendingKeyCode = nil
-                        self.pendingModifiers = nil
+                        self.currentModifierFlags = 0
+                        self.savedCombo = nil
                         self.onCancel?()
                     } else if event.keyCode == UInt16(kVK_Return) || event.keyCode == UInt16(kVK_ANSI_KeypadEnter) {
-                        // confirm pending single key
-                        if let pk = self.pendingKeyCode, let pm = self.pendingModifiers {
-                            self.pendingKeyCode = nil
-                            self.pendingModifiers = nil
-                            self.onCapture?(pk, pm)
+                        // Confirm saved modifier-only combo (user may have released keys before pressing Enter)
+                        if let combo = self.savedCombo {
+                            self.savedCombo = nil
+                            self.currentModifierFlags = 0
+                            self.onCapture?(combo.keyCode, combo.flags)
                         }
                     } else {
                         let flags = self.captureFlags(from: event)
-                        if flags != 0 {
-                            // modifier + key → auto-save
-                            self.pendingKeyCode = nil
-                            self.pendingModifiers = nil
-                            self.onCapture?(event.keyCode, flags)
-                        } else {
-                            // single key → pending, wait for Enter
-                            self.pendingKeyCode = event.keyCode
-                            self.pendingModifiers = 0
-                            self.onPending?(event.keyCode, 0)
-                        }
+                        self.savedCombo = nil
+                        self.currentModifierFlags = 0
+                        self.onCapture?(event.keyCode, flags)
                     }
                     return nil
                 }
 
-                if event.type == .flagsChanged,
-                   let modifierCapture = self.modifierOnlyCapture(from: event) {
-                    // modifier-only → pending, wait for Enter
-                    self.pendingKeyCode = modifierCapture.keyCode
-                    self.pendingModifiers = modifierCapture.flags
-                    self.onPending?(modifierCapture.keyCode, modifierCapture.flags)
+                if event.type == .flagsChanged {
+                    let newFlags = self.captureFlags(from: event)
+                    let addedFlags = newFlags & ~self.currentModifierFlags
+                    self.currentModifierFlags = newFlags
+
+                    if addedFlags != 0 {
+                        // New modifier pressed — save combo and show as pending
+                        self.savedCombo = (keyCode: event.keyCode, flags: newFlags)
+                        self.onPending?(event.keyCode, newFlags)
+                    }
+                    // Don't clear savedCombo on release — user confirms with Enter
                     return nil
                 }
 
@@ -149,38 +147,15 @@ private final class ShortcutCaptureNSView: NSView {
     private func captureFlags(from event: NSEvent) -> UInt64 {
         var flags: UInt64 = 0
         if event.modifierFlags.contains(.control) { flags |= CGEventFlags.maskControl.rawValue }
-        if event.modifierFlags.contains(.option) { flags |= CGEventFlags.maskAlternate.rawValue }
-        if event.modifierFlags.contains(.shift) { flags |= CGEventFlags.maskShift.rawValue }
+        if event.modifierFlags.contains(.option)  { flags |= CGEventFlags.maskAlternate.rawValue }
+        if event.modifierFlags.contains(.shift)   { flags |= CGEventFlags.maskShift.rawValue }
         if event.modifierFlags.contains(.command) { flags |= CGEventFlags.maskCommand.rawValue }
         if event.modifierFlags.contains(.function) { flags |= CGEventFlags.maskSecondaryFn.rawValue }
         return flags
     }
 
-    private func modifierOnlyCapture(from event: NSEvent) -> (keyCode: UInt16, flags: UInt64)? {
-        let flags = captureFlags(from: event)
-        guard flags != 0 else { return nil }
-        guard (flags & (flags - 1)) == 0 else { return nil }
-
-        switch Int(event.keyCode) {
-        case kVK_Command, kVK_RightCommand:
-            return (event.keyCode, CGEventFlags.maskCommand.rawValue)
-        case kVK_Control, kVK_RightControl:
-            return (event.keyCode, CGEventFlags.maskControl.rawValue)
-        case kVK_Option, kVK_RightOption:
-            return (event.keyCode, CGEventFlags.maskAlternate.rawValue)
-        case kVK_Shift, kVK_RightShift:
-            return (event.keyCode, CGEventFlags.maskShift.rawValue)
-        case kVK_Function:
-            return (event.keyCode, CGEventFlags.maskSecondaryFn.rawValue)
-        default:
-            return nil
-        }
-    }
-
     override func removeFromSuperview() {
-        if let monitor = monitor {
-            NSEvent.removeMonitor(monitor)
-        }
+        if let monitor = monitor { NSEvent.removeMonitor(monitor) }
         monitor = nil
         super.removeFromSuperview()
     }

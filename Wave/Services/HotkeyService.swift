@@ -11,6 +11,8 @@ final class HotkeyService {
     private var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
     private var modifierShortcutIsPressed = false
+    // Tracks which specific modifier keyCodes are currently held (distinguishes L vs R keys)
+    private var heldModifierKeyCodes: Set<CGKeyCode> = []
 
     func start() {
         modifierShortcutIsPressed = false
@@ -44,6 +46,7 @@ final class HotkeyService {
 
     func stop() {
         modifierShortcutIsPressed = false
+        heldModifierKeyCodes.removeAll()
         if let tap = eventTap {
             CGEvent.tapEnable(tap: tap, enable: false)
             if let source = runLoopSource {
@@ -75,11 +78,18 @@ final class HotkeyService {
                 return Unmanaged.passRetained(event)
             }
 
-            guard keyCode == targetKeyCode else {
-                return Unmanaged.passRetained(event)
+            // Track which specific modifier keys are held to distinguish L vs R
+            if currentMods.rawValue > (heldModifierKeyCodes.isEmpty ? 0 : 1) {
+                heldModifierKeyCodes.insert(keyCode)
+            } else {
+                heldModifierKeyCodes.remove(keyCode)
             }
+            if currentMods.isEmpty { heldModifierKeyCodes.removeAll() }
 
+            // Flags must match AND the target key must actually be held
             let isPressed = currentMods == targetMods && !currentMods.isEmpty
+                && heldModifierKeyCodes.contains(targetKeyCode)
+
             if isPressed && !modifierShortcutIsPressed {
                 modifierShortcutIsPressed = true
                 onKeyDown?()

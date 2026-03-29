@@ -12,6 +12,7 @@ private let kActiveH: CGFloat = 28
 private final class OverlayDrawView: NSView {
     var status: AppStatus = .idle { didSet { needsDisplay = true } }
     var audioLevel: Float = 0
+    var isAIMode: Bool = false { didSet { needsDisplay = true } }
 
     private var phase: Double = 0
     private var displayLink: CVDisplayLink?
@@ -70,7 +71,10 @@ private final class OverlayDrawView: NSView {
             let rect = CGRect(x: barX, y: centerY - h / 2, width: barW, height: h)
             let path = CGPath(roundedRect: rect, cornerWidth: barW / 2, cornerHeight: barW / 2, transform: nil)
             let t = CGFloat(i) / CGFloat(barCount - 1)
-            ctx.setFillColor(CGColor(red: 0.42 + t * 0.2, green: 0.52 - t * 0.1, blue: 1.0, alpha: 1.0))
+            let color: CGColor = isAIMode
+                ? CGColor(red: 0.42 + t * 0.2, green: 0.52 - t * 0.1, blue: 1.0, alpha: 1.0)
+                : CGColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.85)
+            ctx.setFillColor(color)
             ctx.addPath(path); ctx.fillPath()
         }
     }
@@ -169,6 +173,10 @@ final class OverlayPanel: NSPanel {
 
     func setAudioLevel(_ level: Float) {
         drawView.audioLevel = level
+    }
+
+    func setAIMode(_ enabled: Bool) {
+        drawView.isAIMode = enabled
     }
 
     @objc private func screenDidChange() { positionOnScreen() }

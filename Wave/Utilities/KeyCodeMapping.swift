@@ -90,12 +90,22 @@ struct KeyCodeMapping {
     }
 
     static func displayString(keyCode: UInt16, modifiers: CGEventFlags) -> String {
-        let mods = modifierNames(for: modifiers)
         let key = displayName(for: keyCode)
-        if isModifierKey(keyCode), mods.count == 1 {
-            return key
+        guard isModifierKey(keyCode) else {
+            return (modifierNames(for: modifiers) + [key]).joined(separator: " + ")
         }
-        return (mods + [key]).joined(separator: " + ")
+        // Modifier-only shortcut: strip the flag the keyCode already represents so it isn't shown twice
+        var remaining = modifiers
+        switch Int(keyCode) {
+        case kVK_Option, kVK_RightOption:   remaining.remove(.maskAlternate)
+        case kVK_Command, kVK_RightCommand: remaining.remove(.maskCommand)
+        case kVK_Control, kVK_RightControl: remaining.remove(.maskControl)
+        case kVK_Shift, kVK_RightShift:     remaining.remove(.maskShift)
+        case kVK_Function:                  remaining.remove(.maskSecondaryFn)
+        default: break
+        }
+        let otherMods = modifierNames(for: remaining)
+        return (otherMods + [key]).joined(separator: " + ")
     }
 
     private static func isModifierKey(_ keyCode: UInt16) -> Bool {

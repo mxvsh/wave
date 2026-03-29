@@ -41,7 +41,7 @@ struct HomePageView: View {
 
                 ScrollView {
                     LazyVStack(spacing: 0) {
-                        ForEach(appState.historyManager.records) { record in
+                        ForEach(appState.historyManager.records.prefix(10)) { record in
                             TranscriptionRow(record: record) {
                                 appState.historyManager.remove(record.id)
                             }

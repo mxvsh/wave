@@ -18,6 +18,13 @@ enum AppStatus: Equatable {
     case error(String)
 }
 
+enum GroqAPIStatus: Equatable {
+    case unknown
+    case checking
+    case operational
+    case error(String)
+}
+
 @Observable
 @MainActor
 final class AppState {
@@ -72,13 +79,55 @@ final class AppState {
         }
     }
 
+    // MARK: - Prompts
+    var whisperPrompt: String {
+        didSet { UserDefaults.standard.set(whisperPrompt, forKey: "whisperPrompt") }
+    }
+    var llmSystemPrompt: String {
+        didSet { UserDefaults.standard.set(llmSystemPrompt, forKey: "llmSystemPrompt") }
+    }
+
+    // MARK: - Groq
+    var groqAPIStatus: GroqAPIStatus = .unknown
+    var groqFetchedModels: [String] = []
+
+    // MARK: - Usage (cumulative, persisted)
+    var usagePromptTokens: Int {
+        didSet { UserDefaults.standard.set(usagePromptTokens, forKey: "usagePromptTokens") }
+    }
+    var usageCompletionTokens: Int {
+        didSet { UserDefaults.standard.set(usageCompletionTokens, forKey: "usageCompletionTokens") }
+    }
+    var usageTotalTokens: Int {
+        didSet { UserDefaults.standard.set(usageTotalTokens, forKey: "usageTotalTokens") }
+    }
+    var usageTotalTime: Double {
+        didSet { UserDefaults.standard.set(usageTotalTime, forKey: "usageTotalTime") }
+    }
+    var usageRequestCount: Int {
+        didSet { UserDefaults.standard.set(usageRequestCount, forKey: "usageRequestCount") }
+    }
+
+    // MARK: - AI Mode Settings
+    var aiModeKeyCode: UInt16 {
+        didSet { UserDefaults.standard.set(Int(aiModeKeyCode), forKey: "aiModeKeyCode") }
+    }
+    var aiModeModifiers: UInt64 {
+        didSet { UserDefaults.standard.set(aiModeModifiers, forKey: "aiModeModifiers") }
+    }
+    var aiModel: String {
+        didSet { UserDefaults.standard.set(aiModel, forKey: "aiModel") }
+    }
+
     // MARK: - Services
     let modelManager = ModelManager()
     let transcriptionService = TranscriptionService()
     let hotkeyService = HotkeyService()
+    let aiHotkeyService = HotkeyService()
     let historyManager = HistoryManager()
     let microphoneManager = MicrophoneManager()
     var isModelLoaded = false   // tracked by @Observable — TranscriptionService is not
+    var isAIMode = false
 
     var isReady: Bool {
         switch transcriptionProvider {
@@ -100,6 +149,13 @@ final class AppState {
         )
     }
 
+    var aiShortcutDisplayString: String {
+        KeyCodeMapping.displayString(
+            keyCode: aiModeKeyCode,
+            modifiers: CGEventFlags(rawValue: aiModeModifiers)
+        )
+    }
+
     init() {
         isOnboardingComplete = UserDefaults.standard.bool(forKey: "isOnboardingComplete")
         dictationMode = DictationMode(rawValue: UserDefaults.standard.string(forKey: "dictationMode") ?? "") ?? .pushToTalk
@@ -117,6 +173,17 @@ final class AppState {
         groqModel = UserDefaults.standard.string(forKey: "groqModel") ?? "whisper-large-v3-turbo"
         transcriptionLanguage = UserDefaults.standard.string(forKey: "transcriptionLanguage") ?? "auto"
         selectedMicUID = UserDefaults.standard.string(forKey: "selectedMicUID") ?? ""
+        aiModeKeyCode = UInt16(UserDefaults.standard.integer(forKey: "aiModeKeyCode"))
+        aiModeModifiers = UInt64(UserDefaults.standard.integer(forKey: "aiModeModifiers"))
+        aiModel = UserDefaults.standard.string(forKey: "aiModel") ?? "openai/gpt-oss-20b"
+        groqFetchedModels = UserDefaults.standard.stringArray(forKey: "groqFetchedModels") ?? []
+        whisperPrompt = UserDefaults.standard.string(forKey: "whisperPrompt") ?? ""
+        llmSystemPrompt = UserDefaults.standard.string(forKey: "llmSystemPrompt") ?? "You are a concise assistant inside a macOS voice dictation app. The user spoke their request and it was transcribed. Answer directly — no preamble, no filler, no sign-off. If the answer is a single word or number, just say it. Match the brevity of the question."
+        usagePromptTokens = UserDefaults.standard.integer(forKey: "usagePromptTokens")
+        usageCompletionTokens = UserDefaults.standard.integer(forKey: "usageCompletionTokens")
+        usageTotalTokens = UserDefaults.standard.integer(forKey: "usageTotalTokens")
+        usageTotalTime = UserDefaults.standard.double(forKey: "usageTotalTime")
+        usageRequestCount = UserDefaults.standard.integer(forKey: "usageRequestCount")
 
         // Apply saved mic selection — didSet doesn't fire during init
         if !selectedMicUID.isEmpty {
@@ -127,6 +194,12 @@ final class AppState {
         if hotkeyKeyCode == 0 && hotkeyModifiers == 0 {
             hotkeyKeyCode = 61 // kVK_RightOption
             hotkeyModifiers = CGEventFlags.maskAlternate.rawValue
+        }
+
+        // Default AI shortcut: Right Command + Right Option
+        if aiModeKeyCode == 0 && aiModeModifiers == 0 {
+            aiModeKeyCode = 61 // kVK_RightOption (completing key)
+            aiModeModifiers = CGEventFlags([.maskCommand, .maskAlternate]).rawValue
         }
 
         if !isOnboardingComplete {
@@ -141,12 +214,14 @@ final class AppState {
     }
 
     func setupHotkey() {
+        // Normal dictation hotkey
         hotkeyService.targetKeyCode = CGKeyCode(hotkeyKeyCode)
         hotkeyService.targetModifiers = CGEventFlags(rawValue: hotkeyModifiers)
 
         hotkeyService.onKeyDown = { [weak self] in
             DispatchQueue.main.async {
                 guard let self = self else { return }
+                self.isAIMode = false
                 switch self.dictationMode {
                 case .pushToTalk:
                     if self.status == .idle {
@@ -174,6 +249,42 @@ final class AppState {
         }
 
         hotkeyService.start()
+
+        // AI mode hotkey
+        aiHotkeyService.targetKeyCode = CGKeyCode(aiModeKeyCode)
+        aiHotkeyService.targetModifiers = CGEventFlags(rawValue: aiModeModifiers)
+
+        aiHotkeyService.onKeyDown = { [weak self] in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                self.isAIMode = true
+                switch self.dictationMode {
+                case .pushToTalk:
+                    if self.status == .idle {
+                        self.isKeyHeld = true
+                        Task { await self.startDictation() }
+                    }
+                case .toggle:
+                    if self.status == .idle {
+                        Task { await self.startDictation() }
+                    } else if self.status == .recording {
+                        Task { await self.stopDictationAndPaste() }
+                    }
+                }
+            }
+        }
+
+        aiHotkeyService.onKeyUp = { [weak self] in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                if self.dictationMode == .pushToTalk && self.isKeyHeld && self.status == .recording {
+                    self.isKeyHeld = false
+                    Task { await self.stopDictationAndPaste() }
+                }
+            }
+        }
+
+        aiHotkeyService.start()
     }
 
     func startDictation() async {
@@ -187,6 +298,7 @@ final class AppState {
         do {
             status = .recording
             showOverlay()
+            overlayPanel?.setAIMode(isAIMode)
             if !selectedMicUID.isEmpty { microphoneManager.applySelection(uid: selectedMicUID) }
             if muteSystemAudio { SystemAudioDucker.duck() }
             try await transcriptionService.startRecording()
@@ -205,6 +317,8 @@ final class AppState {
             try? await Task.sleep(for: .seconds(2))
             status = .idle
             overlayPanel?.updateStatus(.idle)
+            overlayPanel?.setAIMode(false)
+            isAIMode = false
         }
     }
 
@@ -214,12 +328,12 @@ final class AppState {
 
         let prompt = customVocabulary.isEmpty ? nil : customVocabulary.joined(separator: " ")
         let lang = transcriptionLanguage == "auto" ? nil : transcriptionLanguage
-        let text: String?
+        let transcribed: String?
         switch transcriptionProvider {
         case .local:
-            text = await transcriptionService.stopRecordingAndTranscribe(includePunctuation: includePunctuation, language: lang, initialPrompt: prompt)
+            transcribed = await transcriptionService.stopRecordingAndTranscribe(includePunctuation: includePunctuation, language: lang, initialPrompt: prompt)
         case .groq:
-            text = await transcriptionService.stopRecordingAndTranscribeWithGroq(
+            transcribed = await transcriptionService.stopRecordingAndTranscribeWithGroq(
                 apiKey: groqAPIKey,
                 model: groqModel,
                 includePunctuation: includePunctuation,
@@ -229,8 +343,24 @@ final class AppState {
         }
         if muteSystemAudio { SystemAudioDucker.restore() }
 
+        let text: String?
+        if isAIMode, let query = transcribed, !query.isEmpty, !groqAPIKey.isEmpty {
+            print("[wave] sending to AI: '\(query)'")
+            let result = await transcriptionService.sendToAI(text: query, apiKey: groqAPIKey, model: aiModel, systemPrompt: llmSystemPrompt)
+            usagePromptTokens += result.promptTokens
+            usageCompletionTokens += result.completionTokens
+            usageTotalTokens += result.totalTokens
+            usageTotalTime += result.totalTime
+            usageRequestCount += 1
+            text = result.text
+        } else {
+            text = transcribed
+        }
+
         status = .idle
         overlayPanel?.updateStatus(.idle)
+        overlayPanel?.setAIMode(false)
+        isAIMode = false
 
         if let text = text, !text.isEmpty {
             print("[wave] pasting: '\(text)'")
@@ -242,6 +372,39 @@ final class AppState {
         }
 
         status = .idle
+    }
+
+    func verifyAndFetchGroqModels() async {
+        guard !groqAPIKey.isEmpty else { groqAPIStatus = .unknown; return }
+        groqAPIStatus = .checking
+
+        let url = URL(string: "https://api.groq.com/openai/v1/models")!
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(groqAPIKey)", forHTTPHeaderField: "Authorization")
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+                groqAPIStatus = .error("Invalid API key")
+                return
+            }
+            struct GroqModelEntry: Decodable {
+                let id: String
+                let active: Bool
+                enum CodingKeys: String, CodingKey { case id, active }
+            }
+            struct GroqModelList: Decodable { let data: [GroqModelEntry] }
+            let list = try JSONDecoder().decode(GroqModelList.self, from: data)
+            let chatModels = list.data
+                .filter { $0.active && !$0.id.localizedCaseInsensitiveContains("whisper") && !$0.id.localizedCaseInsensitiveContains("distil") }
+                .map { $0.id }
+                .sorted()
+            groqFetchedModels = chatModels
+            UserDefaults.standard.set(chatModels, forKey: "groqFetchedModels")
+            groqAPIStatus = .operational
+        } catch {
+            groqAPIStatus = .error("Connection failed")
+        }
     }
 
     func loadSelectedModel() async {

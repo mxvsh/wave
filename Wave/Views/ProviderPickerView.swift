@@ -6,11 +6,9 @@ struct ProviderPickerView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        @Bindable var state = appState
-
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Model")
+                Text("Audio Model")
                     .font(.title3.bold())
                 Spacer()
                 Button(action: { dismiss() }) {
@@ -20,13 +18,6 @@ struct ProviderPickerView: View {
                 }
                 .buttonStyle(.plain)
             }
-
-            Picker("", selection: $state.transcriptionProvider) {
-                Text("Local").tag(TranscriptionProvider.local)
-                Text("Groq").tag(TranscriptionProvider.groq)
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
 
             Divider()
 
@@ -38,6 +29,8 @@ struct ProviderPickerView: View {
         }
         .padding()
     }
+
+    // MARK: - Local
 
     @ViewBuilder
     private var localContent: some View {
@@ -73,48 +66,25 @@ struct ProviderPickerView: View {
         }
     }
 
+    // MARK: - Groq
+
     @ViewBuilder
     private var groqContent: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            VStack(alignment: .leading, spacing: 6) {
-                Text("API Key")
-                    .font(.system(size: 13, weight: .medium))
-                HStack(spacing: 6) {
-                    TextField("gsk_...", text: Binding(
-                        get: { appState.groqAPIKey },
-                        set: { appState.groqAPIKey = $0 }
-                    ))
-                    .textFieldStyle(.roundedBorder)
-                    .font(.system(size: 13, design: .monospaced))
-                    Button("Paste") {
-                        if let s = NSPasteboard.general.string(forType: .string) {
-                            appState.groqAPIKey = s
-                        }
-                    }
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 7))
-                    .buttonStyle(.plain)
-                }
+        VStack(alignment: .leading, spacing: 6) {
+            Picker("", selection: Binding(
+                get: { appState.groqModel },
+                set: { appState.groqModel = $0 }
+            )) {
+                Text("whisper-large-v3-turbo  ·  faster  ·  $0.04/hr").tag("whisper-large-v3-turbo")
+                Text("whisper-large-v3  ·  most accurate  ·  $0.111/hr").tag("whisper-large-v3")
             }
-
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Model")
-                    .font(.system(size: 13, weight: .medium))
-                Picker("", selection: Binding(
-                    get: { appState.groqModel },
-                    set: { appState.groqModel = $0 }
-                )) {
-                    Text("whisper-large-v3-turbo  ·  faster  ·  $0.04/hr").tag("whisper-large-v3-turbo")
-                    Text("whisper-large-v3  ·  most accurate  ·  $0.111/hr").tag("whisper-large-v3")
-                }
-                .pickerStyle(.radioGroup)
-                .labelsHidden()
-            }
+            .pickerStyle(.radioGroup)
+            .labelsHidden()
         }
         .padding(.bottom, 8)
     }
+
+    // MARK: - Local model row
 
     @ViewBuilder
     private func modelRow(_ model: WhisperModel) -> some View {
