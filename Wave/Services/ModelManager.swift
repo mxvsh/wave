@@ -36,6 +36,7 @@ struct WhisperModel: Identifiable, Equatable {
 final class ModelManager {
     var downloadProgress: [String: Double] = [:]
     var downloadingModelId: String?
+    var downloadedFilenames: Set<String> = []
     var selectedModelPath: String? {
         didSet {
             UserDefaults.standard.set(selectedModelPath, forKey: "selectedModelPath")
@@ -54,6 +55,11 @@ final class ModelManager {
 
     init() {
         selectedModelPath = UserDefaults.standard.string(forKey: "selectedModelPath")
+        downloadedFilenames = Set(
+            WhisperModel.available
+                .filter { FileManager.default.fileExists(atPath: Self.modelsDirectory.appendingPathComponent($0.filename).path) }
+                .map { $0.filename }
+        )
     }
 
     func fileURL(for model: WhisperModel) -> URL {
@@ -61,7 +67,7 @@ final class ModelManager {
     }
 
     func isDownloaded(_ model: WhisperModel) -> Bool {
-        FileManager.default.fileExists(atPath: fileURL(for: model).path)
+        downloadedFilenames.contains(model.filename)
     }
 
     func download(_ model: WhisperModel) {
@@ -91,6 +97,7 @@ final class ModelManager {
                         try FileManager.default.removeItem(at: dest)
                     }
                     try FileManager.default.moveItem(at: tempURL, to: dest)
+                    self.downloadedFilenames.insert(model.filename)
                 } catch {
                     print("File move error: \(error.localizedDescription)")
                 }
@@ -126,6 +133,7 @@ final class ModelManager {
     func deleteModel(_ model: WhisperModel) {
         let url = fileURL(for: model)
         try? FileManager.default.removeItem(at: url)
+        downloadedFilenames.remove(model.filename)
         if selectedModelPath == url.path {
             selectedModelPath = nil
         }

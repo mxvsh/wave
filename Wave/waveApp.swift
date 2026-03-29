@@ -17,8 +17,6 @@ struct WaveApp: App {
         .commands {
             CommandGroup(replacing: .newItem) {}
             CommandGroup(replacing: .undoRedo) {}
-            CommandGroup(replacing: .pasteboard) {}
-            CommandGroup(replacing: .textEditing) {}
             CommandGroup(replacing: .textFormatting) {}
             CommandGroup(replacing: .toolbar) {}
             CommandGroup(replacing: .sidebar) {}

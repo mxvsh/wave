@@ -79,16 +79,24 @@ struct HomeView: View {
                 Text("Model")
                     .font(.headline)
                 HStack {
-                    if let path = appState.modelManager.selectedModelPath {
-                        let name = URL(fileURLWithPath: path).lastPathComponent
-                        Label(name, systemImage: "brain")
+                    switch appState.transcriptionProvider {
+                    case .local:
+                        if let path = appState.modelManager.selectedModelPath {
+                            let name = URL(fileURLWithPath: path).lastPathComponent
+                            Label(name, systemImage: "brain")
+                                .font(.system(size: 13))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        } else {
+                            Text("No model selected")
+                                .font(.system(size: 13))
+                                .foregroundStyle(.secondary)
+                        }
+                    case .groq:
+                        Label(appState.groqModel, systemImage: "cloud")
                             .font(.system(size: 13))
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
-                    } else {
-                        Text("No model selected")
-                            .font(.system(size: 13))
-                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Button("Change...") { showModelPicker = true }
@@ -154,9 +162,9 @@ struct HomeView: View {
         }
         .background(WindowConfigurator().frame(width: 0, height: 0))
         .sheet(isPresented: $showModelPicker) {
-            ModelPickerView()
+            ProviderPickerView()
                 .environment(appState)
-                .frame(width: 420, height: 420)
+                .frame(width: 420)
         }
         .sheet(isPresented: $showDictionaryEditor) {
             DictionaryEditorView()
@@ -201,7 +209,7 @@ struct HomeView: View {
 
     private var statusColor: Color {
         switch appState.status {
-        case .idle: return appState.isModelLoaded ? .green : .orange
+        case .idle: return appState.isReady ? .green : .orange
         case .recording: return .red
         case .transcribing: return .blue
         case .error: return .red
@@ -210,7 +218,9 @@ struct HomeView: View {
 
     private var statusText: String {
         switch appState.status {
-        case .idle: return appState.isModelLoaded ? "Ready" : "No model loaded"
+        case .idle:
+            if appState.isReady { return "Ready" }
+            return appState.transcriptionProvider == .groq ? "Groq API key required" : "No model loaded"
         case .recording: return "Recording..."
         case .transcribing: return "Transcribing..."
         case .error(let msg): return msg

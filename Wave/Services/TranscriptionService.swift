@@ -56,6 +56,57 @@ final class TranscriptionService: NSObject, AVAudioRecorderDelegate {
         }
     }
 
+    func stopRecordingAndTranscribeWithGroq(apiKey: String, model: String, includePunctuation: Bool, initialPrompt: String? = nil) async -> String? {
+        await recorder.stopRecording()
+        guard let recordedFile = recordedFile else { return nil }
+        guard let fileData = try? Data(contentsOf: recordedFile) else { return nil }
+
+        let url = URL(string: "https://api.groq.com/openai/v1/audio/transcriptions")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+
+        let boundary = UUID().uuidString
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+        var body = Data()
+        func append(_ string: String) { body.append(string.data(using: .utf8)!) }
+
+        append("--\(boundary)\r\n")
+        append("Content-Disposition: form-data; name=\"file\"; filename=\"audio.wav\"\r\n")
+        append("Content-Type: audio/wav\r\n\r\n")
+        body.append(fileData)
+        append("\r\n")
+
+        append("--\(boundary)\r\n")
+        append("Content-Disposition: form-data; name=\"model\"\r\n\r\n")
+        append(model)
+        append("\r\n")
+
+        if let prompt = initialPrompt {
+            append("--\(boundary)\r\n")
+            append("Content-Disposition: form-data; name=\"prompt\"\r\n\r\n")
+            append(prompt)
+            append("\r\n")
+        }
+
+        append("--\(boundary)--\r\n")
+        request.httpBody = body
+
+        do {
+            let (data, _) = try await URLSession.shared.data(for: request)
+            struct GroqResponse: Decodable { let text: String }
+            let response = try JSONDecoder().decode(GroqResponse.self, from: data)
+            print("[wave] groq raw: '\(response.text)'")
+            let cleaned = Self.clean(response.text, includePunctuation: includePunctuation)
+            print("[wave] groq cleaned: '\(cleaned ?? "nil — nothing to paste")'")
+            return cleaned
+        } catch {
+            print("[wave] groq error: \(error)")
+            return nil
+        }
+    }
+
     // MARK: - Helpers
 
     private static let noiseTokens: Set<String> = [
