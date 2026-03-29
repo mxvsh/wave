@@ -5,7 +5,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Wave — OG Banner</title>
+    <title>Wave — OG Banners</title>
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -15,11 +15,19 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        gap: 2rem;
-        padding: 2rem;
+        gap: 3rem;
+        padding: 3rem 2rem;
         font-family: "Inter", system-ui, sans-serif;
         -webkit-font-smoothing: antialiased;
+      }
+
+      /* ── Per-banner section ── */
+      .banner-section {
+        width: 100%;
+        max-width: min(1200px, 100%);
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
       }
 
       .toolbar {
@@ -30,32 +38,20 @@
 
       .toolbar-label {
         font-size: 13px;
-        color: rgba(148,163,184,0.7);
+        color: rgba(148,163,184,0.5);
         letter-spacing: 0.04em;
+        flex: 1;
       }
 
-      .download-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        background: #7b6ef6;
-        color: #fff;
-        border: none;
-        border-radius: 10px;
-        padding: 0.55rem 1.1rem;
+      .toolbar-title {
         font-size: 13px;
         font-weight: 600;
-        cursor: pointer;
-        transition: opacity 0.15s;
+        color: rgba(148,163,184,0.8);
       }
-      .download-btn:hover { opacity: 0.85; }
-      .download-btn:active { opacity: 0.7; }
-      .download-btn svg { width: 14px; height: 14px; }
 
-      /* Scale wrapper — keeps banner at natural size for html2canvas, scales it visually */
+
       .banner-outer {
         width: 100%;
-        max-width: min(1200px, 100%);
         overflow: hidden;
         border-radius: 16px;
         border: 1px solid rgba(255,255,255,0.08);
@@ -67,8 +63,8 @@
         transform-origin: top left;
       }
 
-      /* ── Banner ── */
-      #og-banner {
+      /* ── Shared banner base ── */
+      .og-banner {
         width: 1200px;
         height: 630px;
         background: #06070a;
@@ -78,91 +74,66 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 0;
         padding: 48px 80px;
       }
 
-      /* Ambient glows */
-      .glow-1 {
+      .glow-tl {
         position: absolute;
-        top: -120px;
-        right: -80px;
-        width: 520px;
-        height: 520px;
+        top: -120px; left: -80px;
+        width: 500px; height: 500px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(123,110,246,0.18) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(123,110,246,0.15) 0%, transparent 70%);
         pointer-events: none;
       }
-      .glow-2 {
+      .glow-br {
         position: absolute;
-        bottom: -100px;
-        left: -60px;
-        width: 480px;
-        height: 480px;
+        bottom: -100px; right: -60px;
+        width: 480px; height: 480px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(79,142,247,0.13) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(79,142,247,0.11) 0%, transparent 70%);
         pointer-events: none;
       }
-      .glow-3 {
+      .glow-center {
         position: absolute;
-        top: 50%;
-        left: 50%;
+        top: 50%; left: 50%;
         transform: translate(-50%, -50%);
-        width: 600px;
-        height: 300px;
+        width: 600px; height: 300px;
         border-radius: 50%;
-        background: radial-gradient(ellipse, rgba(123,110,246,0.07) 0%, transparent 70%);
+        background: radial-gradient(ellipse, rgba(123,110,246,0.06) 0%, transparent 70%);
         pointer-events: none;
       }
 
-      /* Subtle grid lines */
       .grid-overlay {
         position: absolute;
         inset: 0;
         background-image:
-          linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+          linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
         background-size: 60px 60px;
         pointer-events: none;
       }
 
-      /* Top edge accent line */
       .top-line {
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
+        top: 0; left: 0; right: 0;
         height: 1px;
         background: linear-gradient(90deg, transparent 0%, rgba(123,110,246,0.6) 50%, transparent 100%);
       }
 
-      /* Content */
+      /* ── Banner content ── */
       .banner-content {
         position: relative;
         z-index: 10;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0;
       }
 
-      /* Logo row */
-      .logo-row {
-        display: flex;
-        align-items: center;
+      .og-logo {
         margin-bottom: 28px;
+        opacity: 0.9;
       }
 
-      .og-wave-word {
-        margin-bottom: 24px;
-        font-size: 20px;
-        font-weight: 800;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: #ffffff;
-      }
-
-      /* Headline */
       .og-headline {
         font-size: 34px;
         font-weight: 700;
@@ -172,7 +143,6 @@
         text-align: center;
         margin-bottom: 10px;
       }
-
       .og-headline span {
         background: linear-gradient(135deg, #7b6ef6 0%, #4f8ef7 60%, #a78bfa 100%);
         -webkit-background-clip: text;
@@ -184,10 +154,10 @@
         font-size: 16px;
         color: rgba(148,163,184,0.8);
         letter-spacing: -0.01em;
-        margin-bottom: 0;
+        text-align: center;
       }
 
-      /* Cards */
+      /* ── Cards ── */
       .og-cards {
         display: flex;
         gap: 16px;
@@ -215,65 +185,6 @@
         height: 52px;
       }
 
-      /* Key */
-      .og-key {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-        width: 52px;
-        height: 52px;
-        border-radius: 12px;
-        border: 1px solid rgba(123,110,246,0.5);
-        background: linear-gradient(180deg, rgba(20,22,28,0.95), rgba(9,10,13,0.98));
-        box-shadow: 0 0 20px rgba(123,110,246,0.2), inset 0 1px 0 rgba(255,255,255,0.06);
-      }
-      .og-key-symbol {
-        font-size: 20px;
-        line-height: 1;
-        color: #dcd7ff;
-        font-weight: 300;
-      }
-      .og-key-word {
-        font-size: 8px;
-        font-weight: 500;
-        text-transform: lowercase;
-        color: rgba(220,215,255,0.5);
-        letter-spacing: 0.02em;
-      }
-
-      /* Mini waveform */
-      .og-mini-wave {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        height: 36px;
-      }
-      .og-mbar {
-        display: block;
-        width: 3px;
-        border-radius: 2px;
-        background: linear-gradient(180deg, rgba(123,110,246,0.9), rgba(79,142,247,0.55));
-      }
-
-      /* Cursor box */
-      .og-cursor-box {
-        border: 1px solid rgba(255,255,255,0.08);
-        background: rgba(255,255,255,0.03);
-        border-radius: 8px;
-        padding: 7px 12px;
-      }
-      .og-cursor-text {
-        font-size: 11px;
-        color: rgba(148,163,184,0.5);
-      }
-      .og-cursor {
-        color: #7b6ef6;
-        font-weight: 300;
-        margin-left: 1px;
-      }
-
       .og-card-title {
         font-size: 13px;
         font-weight: 600;
@@ -287,12 +198,35 @@
         line-height: 1.5;
       }
 
-      /* Bottom bar */
+      /* ── Key visual ── */
+      .og-key {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        width: 52px; height: 52px;
+        border-radius: 12px;
+        border: 1px solid rgba(123,110,246,0.5);
+        background: linear-gradient(180deg, rgba(20,22,28,0.95), rgba(9,10,13,0.98));
+        box-shadow: 0 0 20px rgba(123,110,246,0.2), inset 0 1px 0 rgba(255,255,255,0.06);
+      }
+      .og-key-symbol { font-size: 20px; line-height: 1; color: #dcd7ff; font-weight: 300; }
+      .og-key-word   { font-size: 8px; font-weight: 500; text-transform: lowercase; color: rgba(220,215,255,0.5); letter-spacing: 0.02em; }
+
+      /* ── Mini waveform ── */
+      .og-mini-wave { display: flex; align-items: center; gap: 4px; height: 36px; }
+      .og-mbar { display: block; width: 3px; border-radius: 2px; background: linear-gradient(180deg, rgba(123,110,246,0.9), rgba(79,142,247,0.55)); }
+
+      /* ── Cursor box ── */
+      .og-cursor-box { border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); border-radius: 8px; padding: 7px 12px; }
+      .og-cursor-text { font-size: 11px; color: rgba(148,163,184,0.5); }
+      .og-cursor { color: #7b6ef6; font-weight: 300; margin-left: 1px; }
+
+      /* ── Bottom bar ── */
       .og-bottom {
         position: absolute;
-        bottom: 28px;
-        left: 0;
-        right: 0;
+        bottom: 28px; left: 0; right: 0;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -314,166 +248,263 @@
         letter-spacing: 0.02em;
       }
 
-      .og-dot {
-        width: 3px;
-        height: 3px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.15);
+      .og-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.15); }
+      .og-bottom-text { font-size: 13px; color: rgba(100,116,139,0.8); }
+
+      /* ── Snippet visual (for banner 2) ── */
+      .og-snippet-list {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        width: 100%;
+      }
+      .og-snippet-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 8px;
+        padding: 6px 10px;
+      }
+      .og-snippet-tag {
+        font-size: 9px;
+        font-weight: 700;
+        color: #7b6ef6;
+        background: rgba(123,110,246,0.12);
+        border-radius: 4px;
+        padding: 2px 5px;
+        white-space: nowrap;
+        letter-spacing: 0.04em;
+      }
+      .og-snippet-preview {
+        font-size: 10px;
+        color: rgba(148,163,184,0.5);
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
 
-      .og-bottom-text {
-        font-size: 13px;
-        color: rgba(100,116,139,0.8);
+      /* ── Speak pill visual ── */
+      .og-speak-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(123,110,246,0.12);
+        border: 1px solid rgba(123,110,246,0.3);
+        border-radius: 20px;
+        padding: 6px 12px;
       }
+      .og-speak-dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: #7b6ef6;
+        box-shadow: 0 0 6px rgba(123,110,246,0.8);
+      }
+      .og-speak-text { font-size: 11px; color: rgba(196,191,255,0.9); font-style: italic; }
+
+      /* ── Paste visual ── */
+      .og-paste-box {
+        border: 1px solid rgba(79,142,247,0.3);
+        background: rgba(79,142,247,0.06);
+        border-radius: 8px;
+        padding: 7px 12px;
+        text-align: center;
+      }
+      .og-paste-text { font-size: 10px; color: rgba(148,163,184,0.6); }
+      .og-paste-value { font-size: 11px; color: rgba(147,197,253,0.9); font-weight: 500; margin-top: 2px; }
     </style>
   </head>
   <body>
 
-    <div class="toolbar">
-      <span class="toolbar-label">1200 × 630 · Open Graph Banner</span>
-      <button class="download-btn" id="download-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-        Download PNG
-      </button>
-    </div>
+    <!-- ═══════════════════════════════════════
+         Banner 1 — Main / How it works
+    ════════════════════════════════════════ -->
+    <div class="banner-section">
+      <div class="toolbar">
+        <span class="toolbar-title">Main</span>
+        <span class="toolbar-label">1200 × 630</span>
+      </div>
 
-    <div class="banner-outer">
-      <div class="banner-scale" id="banner-scale">
+      <div class="banner-outer">
+        <div class="banner-scale" data-scale-for="og-banner-1">
+          <div class="og-banner" id="og-banner-1">
+            <div class="glow-tl"></div>
+            <div class="glow-br"></div>
+            <div class="glow-center"></div>
+            <div class="grid-overlay"></div>
+            <div class="top-line"></div>
 
-        <div id="og-banner">
-          <div class="glow-1"></div>
-          <div class="glow-2"></div>
-          <div class="glow-3"></div>
-          <div class="grid-overlay"></div>
-          <div class="top-line"></div>
+            <div class="banner-content">
+              <img src="/logo.svg" alt="Wave" width="80" height="37" class="og-logo" />
 
-          <div class="banner-content">
+              <h1 class="og-headline">
+                Your voice, typed instantly.<br />
+                <span>Anywhere on your Mac.</span>
+              </h1>
+              <p class="og-sub">Native dictation with local Whisper or Groq. No accounts. No friction.</p>
 
-            <!-- Logo -->
-            <div class="logo-row">
-              <img src="/logo.svg" alt="Wave" width="80" height="37" style="opacity:0.9" />
+              <div class="og-cards">
+                <div class="og-card">
+                  <div class="og-card-visual">
+                    <div class="og-key">
+                      <span class="og-key-symbol">⌥</span>
+                      <span class="og-key-word">option</span>
+                    </div>
+                  </div>
+                  <p class="og-card-title">Hold Right Option</p>
+                  <p class="og-card-desc">Any app, any screen. No window to open.</p>
+                </div>
+
+                <div class="og-card">
+                  <div class="og-card-visual">
+                    <div class="og-mini-wave">
+                      <span class="og-mbar" style="height:30%"></span>
+                      <span class="og-mbar" style="height:60%"></span>
+                      <span class="og-mbar" style="height:88%"></span>
+                      <span class="og-mbar" style="height:50%"></span>
+                      <span class="og-mbar" style="height:100%"></span>
+                      <span class="og-mbar" style="height:72%"></span>
+                      <span class="og-mbar" style="height:90%"></span>
+                      <span class="og-mbar" style="height:44%"></span>
+                      <span class="og-mbar" style="height:65%"></span>
+                    </div>
+                  </div>
+                  <p class="og-card-title">Say it out loud</p>
+                  <p class="og-card-desc">Speak naturally. Wave listens in real time.</p>
+                </div>
+
+                <div class="og-card">
+                  <div class="og-card-visual">
+                    <div class="og-cursor-box">
+                      <span class="og-cursor-text">your words appear here</span><span class="og-cursor">|</span>
+                    </div>
+                  </div>
+                  <p class="og-card-title">Release to insert</p>
+                  <p class="og-card-desc">Text appears at your cursor, instantly.</p>
+                </div>
+              </div>
             </div>
 
-            <!-- Headline -->
-            <h1 class="og-headline">
-              Your voice, typed instantly.<br />
-              <span>Anywhere on your Mac.</span>
-            </h1>
-            <p class="og-sub">Native dictation with local Whisper or Groq. No accounts. No friction.</p>
-
-            <!-- 3 step cards -->
-            <div class="og-cards">
-
-              <div class="og-card">
-                <div class="og-card-visual">
-                  <div class="og-key">
-                    <span class="og-key-symbol">⌥</span>
-                    <span class="og-key-word">option</span>
-                  </div>
-                </div>
-                <p class="og-card-title">Hold Right Option</p>
-                <p class="og-card-desc">Any app, any screen. No window to open.</p>
-              </div>
-
-              <div class="og-card">
-                <div class="og-card-visual">
-                  <div class="og-mini-wave">
-                    <span class="og-mbar" style="height:30%"></span>
-                    <span class="og-mbar" style="height:60%"></span>
-                    <span class="og-mbar" style="height:88%"></span>
-                    <span class="og-mbar" style="height:50%"></span>
-                    <span class="og-mbar" style="height:100%"></span>
-                    <span class="og-mbar" style="height:72%"></span>
-                    <span class="og-mbar" style="height:90%"></span>
-                    <span class="og-mbar" style="height:44%"></span>
-                    <span class="og-mbar" style="height:65%"></span>
-                  </div>
-                </div>
-                <p class="og-card-title">Say it out loud</p>
-                <p class="og-card-desc">Speak naturally. Wave listens in real time.</p>
-              </div>
-
-              <div class="og-card">
-                <div class="og-card-visual">
-                  <div class="og-cursor-box">
-                    <span class="og-cursor-text">your words appear here</span><span class="og-cursor">|</span>
-                  </div>
-                </div>
-                <p class="og-card-title">Release to insert</p>
-                <p class="og-card-desc">Text appears at your cursor, instantly.</p>
-              </div>
-
+            <div class="og-bottom">
+              <span class="og-macos-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:rgba(148,163,184,0.6)"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                macOS
+              </span>
+              <span class="og-bottom-text">Free &amp; Open Source</span>
+              <span class="og-dot"></span>
+              <span class="og-bottom-text">Local Whisper · Groq · AI Mode</span>
             </div>
-
-          </div>
-
-          <!-- Bottom macOS badge -->
-          <div class="og-bottom">
-            <span class="og-macos-badge">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:rgba(148,163,184,0.6)"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-              macOS
-            </span>
-            <span class="og-bottom-text">Free &amp; Open Source</span>
-            <span class="og-dot"></span>
-            <span class="og-bottom-text">Local Whisper · Groq · AI Mode</span>
           </div>
         </div>
-
       </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- ═══════════════════════════════════════
+         Banner 2 — Snippets
+    ════════════════════════════════════════ -->
+    <div class="banner-section">
+      <div class="toolbar">
+        <span class="toolbar-title">Snippets</span>
+        <span class="toolbar-label">1200 × 630</span>
+      </div>
+
+      <div class="banner-outer">
+        <div class="banner-scale" data-scale-for="og-banner-2">
+          <div class="og-banner" id="og-banner-2">
+            <div class="glow-tl"></div>
+            <div class="glow-br"></div>
+            <div class="glow-center"></div>
+            <div class="grid-overlay"></div>
+            <div class="top-line"></div>
+
+            <div class="banner-content">
+              <img src="/logo.svg" alt="Wave" width="80" height="37" class="og-logo" />
+
+              <h1 class="og-headline">
+                Your most-used text,<br />
+                <span>one shortcut away.</span>
+              </h1>
+              <p class="og-sub">Save your links, templates, and boilerplate. Speak to paste them anywhere.</p>
+
+              <div class="og-cards">
+
+                <!-- Card 1: Save it -->
+                <div class="og-card">
+                  <div class="og-card-visual" style="width:100%">
+                    <div class="og-snippet-list" style="width:100%">
+                      <div class="og-snippet-row">
+                        <span class="og-snippet-tag">email</span>
+                        <span class="og-snippet-preview">send@mxv.sh</span>
+                      </div>
+                      <div class="og-snippet-row">
+                        <span class="og-snippet-tag">addr</span>
+                        <span class="og-snippet-preview">123 Market St, San Francisco…</span>
+                      </div>
+                      <div class="og-snippet-row">
+                        <span class="og-snippet-tag">sig</span>
+                        <span class="og-snippet-preview">Best, — Team Wave</span>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="og-card-title">Save anything</p>
+                  <p class="og-card-desc">Links, addresses, templates — stored and ready.</p>
+                </div>
+
+                <!-- Card 2: Speak it -->
+                <div class="og-card">
+                  <div class="og-card-visual">
+                    <div class="og-speak-pill">
+                      <span class="og-speak-dot"></span>
+                      <span class="og-speak-text">"paste my email"</span>
+                    </div>
+                  </div>
+                  <p class="og-card-title">Speak to use it</p>
+                  <p class="og-card-desc">Say the snippet name and Wave inserts it instantly.</p>
+                </div>
+
+                <!-- Card 3: Inserted -->
+                <div class="og-card">
+                  <div class="og-card-visual">
+                    <div class="og-paste-box">
+                      <p class="og-paste-text">inserted at cursor</p>
+                      <p class="og-paste-value">send@mxv.sh</p>
+                    </div>
+                  </div>
+                  <p class="og-card-title">Paste anywhere</p>
+                  <p class="og-card-desc">Appears at your cursor in any app, every time.</p>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="og-bottom">
+              <span class="og-macos-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:rgba(148,163,184,0.6)"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                macOS
+              </span>
+              <span class="og-bottom-text">Free &amp; Open Source</span>
+              <span class="og-dot"></span>
+              <span class="og-bottom-text">Snippets · AI Mode · Local Whisper</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
-      // Scale banner to fit container
-      function scaleBanner() {
-        const outer = document.querySelector(".banner-outer");
-        const scale = document.getElementById("banner-scale");
-        if (!outer || !scale) return;
+      function scaleBanner(scaleEl: HTMLElement) {
+        const outer = scaleEl.closest(".banner-outer") as HTMLElement;
+        if (!outer) return;
         const ratio = outer.clientWidth / 1200;
-        scale.style.transform = `scale(${ratio})`;
-        scale.style.height = `${630 * ratio}px`;
+        scaleEl.style.transform = `scale(${ratio})`;
+        scaleEl.style.height = `${630 * ratio}px`;
         outer.style.height = `${630 * ratio}px`;
       }
-      scaleBanner();
-      window.addEventListener("resize", scaleBanner);
 
-      // Download
-      document.getElementById("download-btn")?.addEventListener("click", async () => {
-        const btn = document.getElementById("download-btn");
-        if (btn) btn.textContent = "Generating…";
-
-        // Temporarily reset scale so html2canvas captures at full res
-        const scale = document.getElementById("banner-scale");
-        if (scale) {
-          scale.style.transform = "scale(1)";
-          scale.style.height = "630px";
-        }
-
-        await new Promise((r) => setTimeout(r, 60));
-
-        const banner = document.getElementById("og-banner");
-        if (!banner || typeof html2canvas === "undefined") return;
-
-        const canvas = await html2canvas(banner, {
-          width: 1200,
-          height: 630,
-          scale: 2,
-          useCORS: true,
-          backgroundColor: "#06070a",
-        });
-
-        const link = document.createElement("a");
-        link.download = "wave-og-banner.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-
-        // Restore scale
-        scaleBanner();
-        if (btn) {
-          btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download PNG`;
-        }
+      document.querySelectorAll<HTMLElement>(".banner-scale").forEach(scaleBanner);
+      window.addEventListener("resize", () => {
+        document.querySelectorAll<HTMLElement>(".banner-scale").forEach(scaleBanner);
       });
     </script>
 
