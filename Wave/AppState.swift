@@ -67,6 +67,7 @@ final class AppState {
     let modelManager = ModelManager()
     let transcriptionService = TranscriptionService()
     let hotkeyService = HotkeyService()
+    let historyManager = HistoryManager()
     var isModelLoaded = false   // tracked by @Observable — TranscriptionService is not
 
     var isReady: Bool {
@@ -202,6 +203,7 @@ final class AppState {
 
         if let text = text, !text.isEmpty {
             print("[wave] pasting: '\(text)'")
+            historyManager.add(text)
             try? await Task.sleep(for: .milliseconds(100))
             PasteService.paste(text: text)
         } else {

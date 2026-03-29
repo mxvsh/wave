@@ -18,8 +18,6 @@ final class ConfiguratorNSView: NSView {
         super.viewDidMoveToWindow()
         guard let window else { return }
         window.titleVisibility = .hidden
-        window.titlebarAppearsTransparent = true
-        window.styleMask.insert(.fullSizeContentView)
         window.isMovableByWindowBackground = true
         window.delegate = windowDelegate
     }

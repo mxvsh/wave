@@ -11,7 +11,7 @@ struct WaveApp: App {
             HomeView()
                 .environment(appState)
         }
-        .windowStyle(.hiddenTitleBar)
+        .defaultSize(width: 520, height: 440)
         .windowResizability(.contentSize)
         .defaultPosition(.center)
         .commands {
@@ -19,7 +19,6 @@ struct WaveApp: App {
             CommandGroup(replacing: .undoRedo) {}
             CommandGroup(replacing: .textFormatting) {}
             CommandGroup(replacing: .toolbar) {}
-            CommandGroup(replacing: .sidebar) {}
             CommandGroup(replacing: .windowSize) {}
             CommandGroup(replacing: .windowArrangement) {}
             CommandGroup(replacing: .help) {}
@@ -28,10 +27,10 @@ struct WaveApp: App {
         MenuBarExtra {
             switch appState.status {
             case .idle:
-                if appState.isModelLoaded {
+                if appState.isReady {
                     Label("Ready", systemImage: "checkmark.circle")
                 } else {
-                    Label("No model loaded", systemImage: "exclamationmark.triangle")
+                    Label("Not configured", systemImage: "exclamationmark.triangle")
                 }
             case .recording:
                 Label("Recording...", systemImage: "mic.fill")

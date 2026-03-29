@@ -7,47 +7,42 @@ struct DictionaryEditorView: View {
     var body: some View {
         @Bindable var state = appState
 
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Dictionary")
-                .font(.title3.bold())
-
-            Group {
-                if state.customVocabulary.isEmpty {
-                    Text("No terms yet. Add technical names, library names, or jargon below.")
-                        .foregroundStyle(.secondary)
-                        .font(.system(size: 13))
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                        .multilineTextAlignment(.center)
-                } else {
-                    ScrollView {
-                        VStack(spacing: 6) {
-                            ForEach(state.customVocabulary, id: \.self) { term in
-                                HStack {
-                                    Text(term)
-                                        .font(.system(size: 13))
-                                    Spacer()
-                                    Button {
-                                        state.customVocabulary.removeAll { $0 == term }
-                                    } label: {
-                                        Image(systemName: "minus.circle.fill")
-                                            .foregroundStyle(.secondary)
-                                    }
-                                    .buttonStyle(.plain)
+        VStack(alignment: .leading, spacing: 0) {
+            if state.customVocabulary.isEmpty {
+                Text("No terms yet. Add technical names,\nlibrary names, or jargon below.")
+                    .foregroundStyle(.secondary)
+                    .font(.system(size: 13))
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ScrollView {
+                    VStack(spacing: 6) {
+                        ForEach(state.customVocabulary, id: \.self) { term in
+                            HStack {
+                                Text(term)
+                                    .font(.system(size: 13))
+                                Spacer()
+                                Button {
+                                    state.customVocabulary.removeAll { $0 == term }
+                                } label: {
+                                    Image(systemName: "minus.circle.fill")
+                                        .foregroundStyle(.secondary)
                                 }
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 7)
-                                .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 8))
+                                .buttonStyle(.plain)
                             }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 7)
+                            .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 8))
                         }
                     }
-                    .frame(maxHeight: 200)
+                    .padding(.horizontal, 16)
                 }
             }
 
             Divider()
 
             HStack {
-                TextField("Add term…", text: $newTerm)
+                TextField("Add term\u{2026}", text: $newTerm)
                     .textFieldStyle(.roundedBorder)
                     .onSubmit { addTerm(to: &state.customVocabulary) }
                 Button("Add") { addTerm(to: &state.customVocabulary) }
@@ -58,8 +53,9 @@ struct DictionaryEditorView: View {
                     .buttonStyle(.plain)
                     .disabled(newTerm.trimmingCharacters(in: .whitespaces).isEmpty)
             }
+            .padding(16)
         }
-        .padding()
+        .frame(maxHeight: .infinity)
     }
 
     private func addTerm(to list: inout [String]) {
