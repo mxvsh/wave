@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.3.0](https://github.com/mxvsh/wave/compare/v0.2.12...v0.3.0) (2026-03-29)
+
+### Features
+
+* Add Groq provider with API key input and local model delete ([bf422c1](https://github.com/mxvsh/wave/commit/bf422c10c4f7e5e3f3c33ef67d99180ebda995ab))
+* add language selector ([d65d70b](https://github.com/mxvsh/wave/commit/d65d70b0473288817a596fea639b08813725f070))
+* add microphone selector in settings ([9bddfbc](https://github.com/mxvsh/wave/commit/9bddfbcd9c388238cf343bbbcea8762f8bbd7dfc))
+* add persistent bottom bar ([44a3d2e](https://github.com/mxvsh/wave/commit/44a3d2e4a42d824acc24b7c35a1420019d6d67a2))
+* add snippet manager ([6876491](https://github.com/mxvsh/wave/commit/687649120ce5527ba6b89820a5fa156d9e7a6ce5))
+* Change default hotkey to Right Option ([f1db92c](https://github.com/mxvsh/wave/commit/f1db92cddc7121e498e6234bc38b08256f4e49b6))
+* Fix layout issues, remove borders, pin dictionary input to bottom ([68a03ca](https://github.com/mxvsh/wave/commit/68a03ca814825bb3ae7c6fc66403cc912905d1ae))
+* llm system prompt and llm model picker ([0f4a8ff](https://github.com/mxvsh/wave/commit/0f4a8ff4ec56de76d2f5c4be878987f1fcc39ad6))
+* recent transcriptionoption  in menu bar ([880efaf](https://github.com/mxvsh/wave/commit/880efaf8304312a2d33ee5c74747b80438f74de0))
+* Redesign app with NavigationSplitView sidebar, transcription history, and stats ([5a2a5e1](https://github.com/mxvsh/wave/commit/5a2a5e1c6d75d5d782238131d0a5487ff3723396))
+* Replace overlay text with compact wave animation ([720b1fa](https://github.com/mxvsh/wave/commit/720b1fa613703077403ab3a878e6cf52fbdfa79a))
+* set brand color ([953c5ae](https://github.com/mxvsh/wave/commit/953c5ae3aedfde3d24f3ac4797423cf9ad9dfbc2))
+
+### Bug Fixes
+
+* apply selected mic on startup and before each recording ([3997307](https://github.com/mxvsh/wave/commit/3997307b3ffebfb1b55650325f34d481cc41e5b7))
+* Insert transcription via accessibility API instead of clipboard ([041220c](https://github.com/mxvsh/wave/commit/041220c4d6850893e89bca38639968751658da5d))
+* **web:** keyboard ui ([1e82f86](https://github.com/mxvsh/wave/commit/1e82f86c8b1691333fc36785e43956a8f6e76cfc))
+
 ## [0.2.12](https://github.com/mxvsh/wave/compare/v0.2.11...v0.2.12) (2026-03-19)
 
 ### Bug Fixes
