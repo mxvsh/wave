@@ -62,6 +62,12 @@ final class AppState {
     var groqModel: String {
         didSet { UserDefaults.standard.set(groqModel, forKey: "groqModel") }
     }
+    var selectedMicUID: String {
+        didSet {
+            UserDefaults.standard.set(selectedMicUID, forKey: "selectedMicUID")
+            microphoneManager.applySelection(uid: selectedMicUID)
+        }
+    }
 
     // MARK: - Services
     let modelManager = ModelManager()
@@ -106,6 +112,7 @@ final class AppState {
         transcriptionProvider = TranscriptionProvider(rawValue: UserDefaults.standard.string(forKey: "transcriptionProvider") ?? "") ?? .local
         groqAPIKey = UserDefaults.standard.string(forKey: "groqAPIKey") ?? ""
         groqModel = UserDefaults.standard.string(forKey: "groqModel") ?? "whisper-large-v3-turbo"
+        selectedMicUID = UserDefaults.standard.string(forKey: "selectedMicUID") ?? ""
 
         // Default shortcut: Right Option
         if hotkeyKeyCode == 0 && hotkeyModifiers == 0 {

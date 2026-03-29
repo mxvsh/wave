@@ -49,6 +49,21 @@ struct SettingsPageView: View {
                         .font(.system(size: 13))
                 }
 
+                // Microphone
+                section("Microphone") {
+                    Picker("Input", selection: Binding(
+                        get: { appState.selectedMicUID },
+                        set: { appState.selectedMicUID = $0 }
+                    )) {
+                        Text("System Default").tag("")
+                        ForEach(appState.microphoneManager.devices) { device in
+                            Text(device.name).tag(device.uid)
+                        }
+                    }
+                    .labelsHidden()
+                    .onAppear { appState.microphoneManager.refresh() }
+                }
+
                 // Models
                 section("Models") {
                     modelRow(
