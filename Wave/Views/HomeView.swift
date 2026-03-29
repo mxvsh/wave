@@ -29,7 +29,7 @@ struct HomeView: View {
             }
             .navigationSplitViewColumnWidth(min: 140, ideal: 160, max: 200)
             .safeAreaInset(edge: .bottom) {
-                Text("Wave")
+                Text("Wave \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "")")
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
