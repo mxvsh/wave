@@ -5,8 +5,29 @@
 
 ## Description
 
-Wave is a lightweight, native macOS dictation app focused on fast voice-to-text workflows with local transcription and minimal UI overhead. Speak with a global shortcut, transcribe locally with Whisper, and paste instantly into the active app.
+Wave is a lightweight, native macOS dictation app focused on fast voice-to-text workflows with minimal UI overhead. Press a shortcut, speak, and your words are instantly pasted at the cursor. Supports on-device transcription via Whisper and cloud transcription via Groq, plus an AI Mode that sends your voice to an LLM and pastes the response directly.
 
+## Features
+
+- **Dictation** — global shortcut triggers recording; transcription is pasted at the active cursor
+- **Push to Talk or Toggle** — hold to record and release, or press once to start and again to stop
+- **Local transcription** — on-device Whisper inference, no internet required
+- **Groq cloud transcription** — faster cloud-based transcription via the Groq API
+- **AI Mode** — separate shortcut sends your voice to an LLM and pastes a direct answer
+- **Snippets** — save reusable text snippets; AI Mode is aware of them
+- **Dictation history** — recent transcriptions with right-click copy
+- **Language selection** — auto-detect or set a specific language (ISO 639-1)
+- **Custom vocabulary** — bias the model toward specific words and names
+- **Microphone selection** — choose any input device or use the system default
+
+## Default shortcuts
+
+| Action | Default |
+|---|---|
+| Dictation | `Fn` |
+| AI Mode | `Right Option` |
+
+Both shortcuts are fully customizable in Settings → Shortcut.
 
 ## Quick start
 
@@ -23,46 +44,41 @@ Download the latest DMG from [Releases](https://github.com/mxvsh/wave/releases/l
 
 ## Build from source
 
-Build the app:
-
 ```bash
 make build
 ```
 
-Open:
 ```bash
 open build/Build/Products/Release/Wave.app
 ```
 
-Or launch from Xcode:
-- Open `Wave.xcodeproj`
-- Select scheme `Wave`
-- Run
+Or launch from Xcode — open `Wave.xcodeproj`, select the `Wave` scheme, and run.
 
 ## Roadmap
 
-- [x] Toggle-style recording mode from settings
-- [x] Local/offline transcription with Whisper models
-- [x] Add optional text cleanup modes (punctuation, capitalization, concise cleanup)
-- [x] Add support for custom dictionary words
-- [ ] Add app-specific behavior profiles (different formatting for IDE/chat/docs)
-- [ ] Add recent dictation history with one-click reinsert/copy
-- [ ] Add quality presets for speed vs accuracy
-- [ ] Add AI agent mode: speak natural-language instructions to write or edit selected text
+- [x] Toggle and Push to Talk recording modes
+- [x] Local offline transcription with Whisper
+- [x] Groq cloud transcription
+- [x] AI Mode with LLM response via Groq
+- [x] Custom dictionary / vocabulary
+- [x] Language selection
+- [x] Dictation history with copy
+- [x] Snippets with AI awareness
+- [x] Microphone selection
+- [ ] App-specific behavior profiles
+- [ ] Quality presets for speed vs accuracy
 
 ## Support
 
-For any feedback or assistance, join the [Discord](https://discord.gg/6YznRVc23J) community.  
-For feature requests, bug reports, or help, you can also create a GitHub issue.
+Join the [Discord](https://discord.gg/6YznRVc23J) community for feedback and help.
+For bug reports and feature requests, open a GitHub issue.
 
 ## Credits
 
-- [whisper.cpp](https://github.com/ggml-org/whisper.cpp) for local speech-to-text inference
-- [Sparkle](https://sparkle-project.org/) for macOS update framework support
-- Apple SwiftUI/AppKit ecosystem for native macOS app foundations
+- [whisper.cpp](https://github.com/ggml-org/whisper.cpp) — local speech-to-text inference
+- [Sparkle](https://sparkle-project.org/) — macOS auto-update framework
+- [PhosphorSwift](https://github.com/phosphor-icons/swift) — icon library
 
 ## Contributing
 
-Contributions are welcome, including AI-assisted feature work.
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, expectations, and validation checklist.
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup and expectations.
