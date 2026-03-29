@@ -56,7 +56,7 @@ const speechModels = [
     <SectionHeading
       eyebrow="Pricing"
       title="Start local, pay only for API usage"
-      description="Run Wave locally for free, or plug in Groq when you want hosted speech or LLM processing at low cost."
+      description="Wave itself is 100% free and open source. You only pay if you use Groq to host the LLM or transcription models."
     />
 
     <div class="mt-12 grid grid-cols-1 gap-4 lg:grid-cols-[1.2fr_0.8fr]">
@@ -105,15 +105,15 @@ const speechModels = [
             <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[color:rgba(52,211,153,0.15)] text-emerald-400">
               <BadgeDollarSign size={20} aria-hidden="true" />
             </div>
-            <div>
-              <p class="text-sm font-semibold text-white">Run locally</p>
-              <p class="text-sm text-slate-400">Whisper on your Mac</p>
-            </div>
+          <div>
+            <p class="text-sm font-semibold text-white">Run locally</p>
+            <p class="text-sm text-slate-400">Wave app plus local Whisper</p>
           </div>
+        </div>
 
           <p class="text-4xl font-semibold tracking-[-0.03em] text-white">$0</p>
           <p class="mt-2 text-sm leading-relaxed text-slate-400">
-            No API bill when you run transcription locally. Bring your own hardware and keep the workflow private.
+            Wave is fully open source and costs nothing to run locally. No API bill unless you choose a hosted provider.
           </p>
         </div>
 
@@ -122,11 +122,11 @@ const speechModels = [
             <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[color:rgba(79,142,247,0.15)] text-[var(--color-accent-2)]">
               <Mic size={20} aria-hidden="true" />
             </div>
-            <div>
-              <p class="text-sm font-semibold text-white">Groq speech-to-text</p>
-              <p class="text-sm text-slate-400">Very cheap hosted transcription</p>
-            </div>
+          <div>
+            <p class="text-sm font-semibold text-white">Groq speech-to-text</p>
+            <p class="text-sm text-slate-400">Hosted transcription pricing</p>
           </div>
+        </div>
 
           <div class="space-y-4">
             {speechModels.map((model) => (

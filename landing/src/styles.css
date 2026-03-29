@@ -203,6 +203,10 @@ body {
   -webkit-backdrop-filter: blur(18px);
 }
 
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
 @media (max-width: 900px) {
   .keyboard-key {
     min-height: 4.2rem;
