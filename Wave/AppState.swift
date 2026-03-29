@@ -114,6 +114,11 @@ final class AppState {
         groqModel = UserDefaults.standard.string(forKey: "groqModel") ?? "whisper-large-v3-turbo"
         selectedMicUID = UserDefaults.standard.string(forKey: "selectedMicUID") ?? ""
 
+        // Apply saved mic selection — didSet doesn't fire during init
+        if !selectedMicUID.isEmpty {
+            microphoneManager.applySelection(uid: selectedMicUID)
+        }
+
         // Default shortcut: Right Option
         if hotkeyKeyCode == 0 && hotkeyModifiers == 0 {
             hotkeyKeyCode = 61 // kVK_RightOption
@@ -178,6 +183,7 @@ final class AppState {
         do {
             status = .recording
             showOverlay()
+            if !selectedMicUID.isEmpty { microphoneManager.applySelection(uid: selectedMicUID) }
             if muteSystemAudio { SystemAudioDucker.duck() }
             try await transcriptionService.startRecording()
             // Poll mic level and drive overlay visualization
