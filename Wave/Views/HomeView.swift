@@ -29,17 +29,12 @@ struct HomeView: View {
             }
             .navigationSplitViewColumnWidth(min: 140, ideal: 160, max: 200)
             .safeAreaInset(edge: .bottom) {
-                HStack(spacing: 6) {
-                    Circle()
-                        .fill(statusColor)
-                        .frame(width: 6, height: 6)
-                    Text(statusText)
-                        .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
+                Text("Wave")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
             }
         } detail: {
             Group {
@@ -71,24 +66,5 @@ struct HomeView: View {
         }
     }
 
-    private var statusColor: Color {
-        switch appState.status {
-        case .idle: return appState.isReady ? .green : .orange
-        case .recording: return .red
-        case .transcribing: return .blue
-        case .error: return .red
-        }
-    }
 
-    private var statusText: String {
-        switch appState.status {
-        case .idle:
-            let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
-            if appState.isReady { return "Wave v\(version)" }
-            return appState.transcriptionProvider == .groq ? "API key needed" : "No model"
-        case .recording: return "Recording\u{2026}"
-        case .transcribing: return "Transcribing\u{2026}"
-        case .error(let msg): return msg
-        }
-    }
 }
