@@ -38,7 +38,7 @@ final class TranscriptionService: NSObject, AVAudioRecorderDelegate {
         var errorDescription: String? { "Microphone access denied" }
     }
 
-    func stopRecordingAndTranscribe(includePunctuation: Bool, initialPrompt: String? = nil) async -> String? {
+    func stopRecordingAndTranscribe(includePunctuation: Bool, language: String? = nil, initialPrompt: String? = nil) async -> String? {
         await recorder.stopRecording()
 
         guard let recordedFile = recordedFile else { return nil }
@@ -48,7 +48,7 @@ final class TranscriptionService: NSObject, AVAudioRecorderDelegate {
             let samples = try decodeWaveFile(recordedFile)
             let peak = samples.map { abs($0) }.max() ?? 0
             print("[wave] decoded \(samples.count) samples, peak amplitude: \(peak)")
-            await whisperContext.fullTranscribe(samples: samples, initialPrompt: initialPrompt)
+            await whisperContext.fullTranscribe(samples: samples, language: language, initialPrompt: initialPrompt)
             let text = await whisperContext.getTranscription()
             print("[wave] raw transcription: '\(text)'")
             let cleaned = Self.clean(text, includePunctuation: includePunctuation)
@@ -60,7 +60,7 @@ final class TranscriptionService: NSObject, AVAudioRecorderDelegate {
         }
     }
 
-    func stopRecordingAndTranscribeWithGroq(apiKey: String, model: String, includePunctuation: Bool, initialPrompt: String? = nil) async -> String? {
+    func stopRecordingAndTranscribeWithGroq(apiKey: String, model: String, includePunctuation: Bool, language: String? = nil, initialPrompt: String? = nil) async -> String? {
         await recorder.stopRecording()
         guard let recordedFile = recordedFile else { return nil }
         guard let fileData = try? Data(contentsOf: recordedFile) else { return nil }
@@ -86,6 +86,13 @@ final class TranscriptionService: NSObject, AVAudioRecorderDelegate {
         append("Content-Disposition: form-data; name=\"model\"\r\n\r\n")
         append(model)
         append("\r\n")
+
+        if let language {
+            append("--\(boundary)\r\n")
+            append("Content-Disposition: form-data; name=\"language\"\r\n\r\n")
+            append(language)
+            append("\r\n")
+        }
 
         if let prompt = initialPrompt {
             append("--\(boundary)\r\n")

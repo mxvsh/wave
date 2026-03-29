@@ -16,42 +16,41 @@ actor WhisperContext {
         whisper_free(context)
     }
 
-    func fullTranscribe(samples: [Float], initialPrompt: String? = nil) {
+    func fullTranscribe(samples: [Float], language: String? = nil, initialPrompt: String? = nil) {
         let maxThreads = max(1, min(8, cpuCount() - 2))
+        let lang = language ?? "auto"
 
-        // Local function to run inference; accepts an optional C-string pointer whose
-        // lifetime is managed by the caller via withCString.
-        func run(promptPtr: UnsafePointer<CChar>?) {
+        func run(langPtr: UnsafePointer<CChar>, promptPtr: UnsafePointer<CChar>?) {
             var params = whisper_full_default_params(WHISPER_SAMPLING_GREEDY)
-            "en".withCString { en in
-                params.print_realtime   = false
-                params.print_progress   = false
-                params.print_timestamps = false
-                params.print_special    = false
-                params.translate        = false
-                params.language         = en
-                params.n_threads        = Int32(maxThreads)
-                params.offset_ms        = 0
-                params.no_context       = true
-                params.single_segment   = false
-                params.initial_prompt   = promptPtr
+            params.print_realtime   = false
+            params.print_progress   = false
+            params.print_timestamps = false
+            params.print_special    = false
+            params.translate        = false
+            params.language         = langPtr
+            params.n_threads        = Int32(maxThreads)
+            params.offset_ms        = 0
+            params.no_context       = true
+            params.single_segment   = false
+            params.initial_prompt   = promptPtr
 
-                whisper_reset_timings(context)
-                samples.withUnsafeBufferPointer { buf in
-                    if whisper_full(context, params, buf.baseAddress, Int32(buf.count)) != 0 {
-                        print("Failed to run the model")
-                    } else {
-                        whisper_print_timings(context)
-                    }
+            whisper_reset_timings(context)
+            samples.withUnsafeBufferPointer { buf in
+                if whisper_full(context, params, buf.baseAddress, Int32(buf.count)) != 0 {
+                    print("Failed to run the model")
+                } else {
+                    whisper_print_timings(context)
                 }
             }
         }
 
         let effectivePrompt = initialPrompt.flatMap { $0.trimmingCharacters(in: .whitespaces).isEmpty ? nil : $0 }
-        if let prompt = effectivePrompt {
-            prompt.withCString { run(promptPtr: $0) }
-        } else {
-            run(promptPtr: nil)
+        lang.withCString { langPtr in
+            if let prompt = effectivePrompt {
+                prompt.withCString { run(langPtr: langPtr, promptPtr: $0) }
+            } else {
+                run(langPtr: langPtr, promptPtr: nil)
+            }
         }
     }
 

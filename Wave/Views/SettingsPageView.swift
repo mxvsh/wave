@@ -47,6 +47,12 @@ struct SettingsPageView: View {
                         .font(.system(size: 13))
                     Toggle("Mute system audio while dictating", isOn: $state.muteSystemAudio)
                         .font(.system(size: 13))
+                    Picker("Language", selection: $state.transcriptionLanguage) {
+                        ForEach(Self.languages, id: \.code) { lang in
+                            Text(lang.label).tag(lang.code)
+                        }
+                    }
+                    .font(.system(size: 13))
                 }
 
                 // Microphone
@@ -120,6 +126,31 @@ struct SettingsPageView: View {
                 .frame(width: 420)
         }
     }
+
+    // MARK: - Language list
+
+    private static let languages: [(code: String, label: String)] = [
+        ("auto", "Auto Detect"),
+        ("en", "English"),
+        ("es", "Spanish"),
+        ("fr", "French"),
+        ("de", "German"),
+        ("it", "Italian"),
+        ("pt", "Portuguese"),
+        ("nl", "Dutch"),
+        ("pl", "Polish"),
+        ("ru", "Russian"),
+        ("ja", "Japanese"),
+        ("zh", "Chinese"),
+        ("ko", "Korean"),
+        ("ar", "Arabic"),
+        ("hi", "Hindi"),
+        ("tr", "Turkish"),
+        ("sv", "Swedish"),
+        ("da", "Danish"),
+        ("fi", "Finnish"),
+        ("no", "Norwegian"),
+    ]
 
     // MARK: - Audio model label
 

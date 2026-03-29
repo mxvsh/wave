@@ -62,6 +62,9 @@ final class AppState {
     var groqModel: String {
         didSet { UserDefaults.standard.set(groqModel, forKey: "groqModel") }
     }
+    var transcriptionLanguage: String {
+        didSet { UserDefaults.standard.set(transcriptionLanguage, forKey: "transcriptionLanguage") }
+    }
     var selectedMicUID: String {
         didSet {
             UserDefaults.standard.set(selectedMicUID, forKey: "selectedMicUID")
@@ -112,6 +115,7 @@ final class AppState {
         transcriptionProvider = TranscriptionProvider(rawValue: UserDefaults.standard.string(forKey: "transcriptionProvider") ?? "") ?? .local
         groqAPIKey = UserDefaults.standard.string(forKey: "groqAPIKey") ?? ""
         groqModel = UserDefaults.standard.string(forKey: "groqModel") ?? "whisper-large-v3-turbo"
+        transcriptionLanguage = UserDefaults.standard.string(forKey: "transcriptionLanguage") ?? "auto"
         selectedMicUID = UserDefaults.standard.string(forKey: "selectedMicUID") ?? ""
 
         // Apply saved mic selection — didSet doesn't fire during init
@@ -208,16 +212,18 @@ final class AppState {
         status = .transcribing
         updateOverlay()
 
-        let prompt = customVocabulary.isEmpty ? nil : customVocabulary.joined(separator: ", ")
+        let prompt = customVocabulary.isEmpty ? nil : customVocabulary.joined(separator: " ")
+        let lang = transcriptionLanguage == "auto" ? nil : transcriptionLanguage
         let text: String?
         switch transcriptionProvider {
         case .local:
-            text = await transcriptionService.stopRecordingAndTranscribe(includePunctuation: includePunctuation, initialPrompt: prompt)
+            text = await transcriptionService.stopRecordingAndTranscribe(includePunctuation: includePunctuation, language: lang, initialPrompt: prompt)
         case .groq:
             text = await transcriptionService.stopRecordingAndTranscribeWithGroq(
                 apiKey: groqAPIKey,
                 model: groqModel,
                 includePunctuation: includePunctuation,
+                language: lang,
                 initialPrompt: prompt
             )
         }
