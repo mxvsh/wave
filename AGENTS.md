@@ -51,7 +51,7 @@ The sidebar is a `NavigationSplitView` with a fixed-width column. Items are grou
 
 - Settings pages (General, Shortcut, Models) are **not scrollable** — use a plain `VStack` with padding.
 - The window size is **fixed**. Do not make it resizable or change its dimensions without explicit instruction.
-- Sidebar icons use **PhosphorSwift** (`Ph.<name>.regular`), always constrained to `frame(width: 16, height: 16)`. Without the frame they stretch. Do not use SF Symbols for sidebar icons.
+- Sidebar icons use **SF Symbols** via `Label("Title", systemImage: "symbol.name")`.
 
 ---
 

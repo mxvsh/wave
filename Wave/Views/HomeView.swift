@@ -1,5 +1,4 @@
 import SwiftUI
-import PhosphorSwift
 
 enum NavItem: String, Hashable {
     case home = "Home"
@@ -13,17 +12,16 @@ enum NavItem: String, Hashable {
     case howToUse = "How to Use"
     case about = "About"
 
-    @ViewBuilder
-    var icon: some View {
+    var icon: String {
         switch self {
-        case .home:       Ph.house.regular.frame(width: 16, height: 16)
-        case .dictionary: Ph.bookOpen.regular.frame(width: 16, height: 16)
-        case .snippets:   Ph.textT.regular.frame(width: 16, height: 16)
-        case .general:    Ph.slidersHorizontal.regular.frame(width: 16, height: 16)
-        case .shortcut:   Ph.keyboard.regular.frame(width: 16, height: 16)
-        case .models:     Ph.cpu.regular.frame(width: 16, height: 16)
-        case .howToUse:   Ph.bookOpenText.regular.frame(width: 16, height: 16)
-        case .about:      Ph.info.regular.frame(width: 16, height: 16)
+        case .home:       return "house"
+        case .dictionary: return "character.book.closed"
+        case .snippets:   return "text.alignleft"
+        case .general:    return "slider.horizontal.3"
+        case .shortcut:   return "keyboard"
+        case .models:     return "cpu"
+        case .howToUse:   return "questionmark.circle"
+        case .about:      return "info.circle"
         }
     }
 }
@@ -35,19 +33,19 @@ struct HomeView: View {
     var body: some View {
         NavigationSplitView {
             List(selection: $selection) {
-                Label(title: { Text("Home") }, icon: { NavItem.home.icon }).tag(NavItem.home)
-                Label(title: { Text("Dictionary") }, icon: { NavItem.dictionary.icon }).tag(NavItem.dictionary)
-                Label(title: { Text("Snippets") }, icon: { NavItem.snippets.icon }).tag(NavItem.snippets)
+                Label("Home", systemImage: NavItem.home.icon).tag(NavItem.home)
+                Label("Dictionary", systemImage: NavItem.dictionary.icon).tag(NavItem.dictionary)
+                Label("Snippets", systemImage: NavItem.snippets.icon).tag(NavItem.snippets)
 
                 Section("Settings") {
-                    Label(title: { Text("General") }, icon: { NavItem.general.icon }).tag(NavItem.general)
-                    Label(title: { Text("Shortcut") }, icon: { NavItem.shortcut.icon }).tag(NavItem.shortcut)
-                    Label(title: { Text("Models") }, icon: { NavItem.models.icon }).tag(NavItem.models)
+                    Label("General", systemImage: NavItem.general.icon).tag(NavItem.general)
+                    Label("Shortcut", systemImage: NavItem.shortcut.icon).tag(NavItem.shortcut)
+                    Label("Models", systemImage: NavItem.models.icon).tag(NavItem.models)
                 }
 
                 Section("Help") {
-                    Label(title: { Text("How to Use") }, icon: { NavItem.howToUse.icon }).tag(NavItem.howToUse)
-                    Label(title: { Text("About") }, icon: { NavItem.about.icon }).tag(NavItem.about)
+                    Label("How to Use", systemImage: NavItem.howToUse.icon).tag(NavItem.howToUse)
+                    Label("About", systemImage: NavItem.about.icon).tag(NavItem.about)
                 }
             }
             .navigationSplitViewColumnWidth(min: 140, ideal: 160, max: 200)
