@@ -47,6 +47,13 @@ const ogImageUrl = new URL(site.ogImage, site.siteUrl).toString();
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
+    {import.meta.env.PROD && (
+      <script
+        defer
+        src="https://analytics.monawwar.io/script.js"
+        data-website-id="c30b723a-435c-4e21-8e4e-98bef7f09e60"
+      ></script>
+    )}
     <title>{title}</title>
   </head>
   <body class="min-h-screen overflow-x-hidden bg-[var(--color-deep)] font-sans text-[var(--color-text)] antialiased">
