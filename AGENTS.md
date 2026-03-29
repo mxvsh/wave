@@ -1,89 +1,95 @@
-# AGENTS.md
+# Wave — CLAUDE.md
 
-## Project Overview
+Wave is a lightweight macOS dictation app. Press a shortcut, speak, and your words are transcribed and pasted at the cursor. It supports on-device Whisper and Groq cloud transcription, plus an AI Mode that sends the transcription to an LLM and pastes the response.
 
-Wave is a native macOS dictation app.
+---
 
-Core flow:
-1. User triggers global shortcut.
-2. App records microphone audio.
-3. Audio is transcribed locally with Whisper.
-4. Transcribed text is pasted into the currently focused app.
+## Architecture
 
-Primary goals:
-- Fast and lightweight
-- Native macOS feel (SwiftUI + AppKit)
-- Minimal UI friction
-- Personal-use source build
+- **Single source of truth.** All app state lives in one `@Observable @MainActor` class (`AppState`). Do not create additional observable singletons or pass state through multiple layers.
+- **Services are owned by `AppState`**, not created in views. Views call methods on the state object; they never instantiate services directly.
+- **All persistent settings** are stored in `UserDefaults` via `didSet` on the property. No other persistence mechanism.
+- **Views are display-only.** Business logic belongs in `AppState` or a service. If a view is doing more than formatting and rendering, move the logic out.
 
-## Tech Stack
+---
 
-- Language: Swift
-- UI: SwiftUI (with AppKit where needed)
-- Hotkeys/events: CGEvent tap
-- Transcription: local Whisper via bundled `whisper.xcframework`
-- Project: Xcode (`Wave.xcodeproj`)
+## Design system
 
-## Important Paths
+Follow these rules consistently. Do not invent new patterns when an existing one covers the case.
 
-- App entry: `Wave/waveApp.swift`
-- App state: `Wave/AppState.swift`
-- Services:
-  - `Wave/Services/HotkeyService.swift`
-  - `Wave/Services/AudioRecorder.swift`
-  - `Wave/Services/TranscriptionService.swift`
-  - `Wave/Services/WhisperContext.swift`
-  - `Wave/Services/UpdaterService.swift`
-- Views:
-  - `Wave/Views/HomeView.swift`
-  - `Wave/Views/OverlayView.swift`
-  - `Wave/Views/OverlayPanel.swift`
-  - `Wave/Views/OnboardingView.swift`
-  - `Wave/Views/ModelPickerView.swift`
-  - `Wave/Views/ShortcutRecorderView.swift`
-- Build scripts:
-  - `Makefile`
-  - `scripts/release.sh`
+**Typography**
+- Section headers: size 11, medium weight, secondary color, uppercase
+- Row labels / body: size 13
+- Secondary detail: size 12, secondary color
+- Monospaced inputs (API keys, code): size 12, monospaced design
+- Captions / metadata: size 11
 
-## Current Product Behavior
+**Spacing**
+- Page padding: 16pt on all sides
+- Between sections: 20pt
+- Within a section: 8pt
 
-- Single-instance app: launching a second instance should focus the first and exit.
-- App appears as a regular macOS app (menu bar app name + Cmd+Tab presence).
-- Overlay shows recording/transcribing/error status.
-- Onboarding completion tracked in `UserDefaults` key: `isOnboardingComplete`.
-- Sparkle updater is wired; feed URL and key come from app Info.plist/build settings.
+**Backgrounds**
+- Card / row: `.quaternary.opacity(0.5)` with `RoundedRectangle(cornerRadius: 8)`
+- Standard button: `.quaternary` with `RoundedRectangle(cornerRadius: 6)`
+- Primary action button: `.blue.opacity(0.15)` background, `.blue` foreground, `RoundedRectangle(cornerRadius: 7)`
 
-## Build & Run
+**Buttons**
+- Always `.buttonStyle(.plain)`
+- Font: size 12, medium weight, rounded design
+- Standard padding: 10pt horizontal, 4pt vertical
+- Primary padding: 10pt horizontal, 5pt vertical
 
-Build:
-```bash
-make build
-```
+**Sections**
+Every settings section follows this exact structure: uppercase label at size 11 in secondary color, followed by the content at 8pt spacing. Reuse the existing `section(_:content:)` helper found in each settings view — do not create a new one.
 
-If incremental build says up to date:
-```bash
-make clean && make build
-```
+---
 
-Run app:
-- Open `build/Build/Products/Release/Wave.app`
-- Or run from Xcode with scheme `Wave`
+## Navigation
 
-## Contributor Guardrails
+The sidebar is a `NavigationSplitView` with a fixed-width column. Items are grouped into sections. The detail pane renders the selected view.
 
-- Preserve low-friction dictation flow (hotkey -> speak -> paste).
-- Avoid introducing heavy runtime dependencies.
-- Prefer native APIs over external wrappers.
-- Keep UI minimal and functional; avoid unnecessary complexity.
-- Validate behavior for:
-  - Global hotkey capture
-  - Focus-safe overlay behavior
-  - Paste reliability
-  - Single-instance launch logic
+- Settings pages (General, Shortcut, Models) are **not scrollable** — use a plain `VStack` with padding.
+- The window size is **fixed**. Do not make it resizable or change its dimensions without explicit instruction.
+- Sidebar icons use **PhosphorSwift** (`Ph.<name>.regular`), always constrained to `frame(width: 16, height: 16)`. Without the frame they stretch. Do not use SF Symbols for sidebar icons.
 
-## Near-Term Feature Direction
+---
 
-- Optional text cleanup modes (punctuation/capitalization)
-- App-specific formatting profiles
-- Dictation history/reuse
-- AI agent mode for natural-language editing of selected text
+## Shortcuts
+
+- Distinguish Left vs Right modifier keys explicitly — flag bitmasks alone (`maskAlternate`, `maskCommand`) are identical for both sides. Track the exact keyCodes being held to tell them apart.
+- The shortcut recorder persists the pressed combination (`savedCombo`) after the user releases keys, so Enter can confirm it even after release. Regular key presses save immediately without needing Enter.
+
+---
+
+## MenuBar
+
+Keep the menu bar menu lean and in this order:
+1. Status (idle / recording / transcribing / error)
+2. Recent Transcriptions submenu (max 7, copy on click, truncate long text)
+3. Check for Updates
+4. Settings (⌘,)
+5. Quit (⌘Q)
+
+Dividers between logical groups, not between every item.
+
+---
+
+## Code style
+
+- No docstrings or comments on code you didn't write or change.
+- No error handling for internal code paths — only at system boundaries (user input, external APIs).
+- No helpers or abstractions for one-off operations.
+- No speculative features, flags, or "future-proofing."
+- Prefer editing existing files over creating new ones.
+- If something is unused, delete it — don't rename it with a leading underscore or leave a comment.
+
+---
+
+## Things never to do
+
+- Do not add `ScrollView` to settings pages.
+- Do not mock services in a way that diverges from production behavior.
+- Do not re-add `CommandGroup(replacing: .undoRedo) {}` — it breaks Cmd+Z in text fields.
+- Do not remove the menu-cleaning logic in `applicationDidBecomeActive` — it removes ghost headers left by SwiftUI `CommandGroup` replacements.
+- Do not push to main or create PRs without being explicitly asked.
