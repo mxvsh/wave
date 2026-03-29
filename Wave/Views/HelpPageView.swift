@@ -29,6 +29,13 @@ struct HelpPageView: View {
                         Link("GitHub", destination: URL(string: "https://github.com/AeroWang/Wave")!)
                             .font(.system(size: 12))
                     }
+                    HStack {
+                        Text("Community")
+                            .font(.system(size: 12))
+                        Spacer()
+                        Link("Discord", destination: URL(string: "https://discord.com/invite/3kUSy2d")!)
+                            .font(.system(size: 12))
+                    }
                 }
             }
             .padding(16)
