@@ -8,8 +8,7 @@ struct ModelsSettingsView: View {
     var body: some View {
         @Bindable var state = appState
 
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 20) {
                 section("Models") {
                     modelRow(
                         icon: "waveform",
@@ -38,7 +37,6 @@ struct ModelsSettingsView: View {
                 }
             }
             .padding(16)
-        }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .sheet(isPresented: $showProviderPicker) {
             ProviderPickerView()

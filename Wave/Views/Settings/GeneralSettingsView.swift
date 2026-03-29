@@ -9,8 +9,7 @@ struct GeneralSettingsView: View {
     var body: some View {
         @Bindable var state = appState
 
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 20) {
                 // Transcription
                 section("Transcription") {
                     Toggle("Include punctuation", isOn: $state.includePunctuation)
@@ -101,7 +100,6 @@ struct GeneralSettingsView: View {
                 }
             }
             .padding(16)
-        }
         .onReceive(Timer.publish(every: 1.5, on: .main, in: .common).autoconnect()) { _ in
             micGranted = PermissionService.isMicrophoneAuthorized()
             accessibilityGranted = PermissionService.isAccessibilityGranted()
