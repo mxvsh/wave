@@ -6,6 +6,9 @@ import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
 
 
+import cloudflare from "@astrojs/cloudflare";
+
+
 // https://astro.build/config
 export default defineConfig({
   vite: {
@@ -13,5 +16,6 @@ export default defineConfig({
   },
 
   site: "https://wave.mxv.sh",
-  integrations: [sitemap({ filter: (page) => !page.includes("/og-banner") })]
+  integrations: [sitemap({ filter: (page) => !page.includes("/og-banner") })],
+  adapter: cloudflare()
 });
