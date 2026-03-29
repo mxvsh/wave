@@ -1,5 +1,4 @@
 ---
-import LogoMark from "./LogoMark.astro";
 import { site } from "../data/site";
 ---
 
@@ -9,7 +8,7 @@ import { site } from "../data/site";
       href="/"
       class="flex items-center gap-2 text-[15px] font-semibold text-slate-400 opacity-70 transition-opacity hover:opacity-100 no-underline"
     >
-      <LogoMark size={22} />
+      <img src="/logo.svg" alt="" class="h-[22px] w-[22px]" />
       <span>{site.name}</span>
     </a>
 

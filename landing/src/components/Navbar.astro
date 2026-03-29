@@ -1,5 +1,4 @@
 ---
-import LogoMark from "./LogoMark.astro";
 import { site } from "../data/site";
 ---
 
@@ -9,18 +8,18 @@ import { site } from "../data/site";
   aria-label="Main navigation"
 >
   <div
-    class="nav-pill pointer-events-auto mx-auto flex max-w-3xl items-center justify-between rounded-full py-2 pl-4 pr-2"
+    class="nav-pill pointer-events-auto mx-auto grid max-w-3xl grid-cols-[auto_1fr_auto] items-center rounded-full py-2 pl-4 pr-2"
   >
     <a
       href="/"
-      class="flex shrink-0 items-center gap-2.5 text-[15px] font-semibold text-white no-underline"
+      class="flex min-w-[6rem] items-center gap-2.5 text-[15px] font-semibold text-white no-underline"
       aria-label="Wave home"
     >
-      <LogoMark size={26} />
+      <img src="/logo.svg" alt="" class="h-[26px] w-[26px]" />
       <span>{site.name}</span>
     </a>
 
-    <ul class="hidden flex-1 list-none items-center justify-center gap-0.5 md:flex">
+    <ul class="hidden list-none items-center justify-center gap-0.5 md:flex">
       {site.navLinks.map((link) => (
         <li>
           <a
@@ -43,13 +42,7 @@ import { site } from "../data/site";
       </li>
     </ul>
 
-    <div class="flex shrink-0 items-center gap-1">
-      <a
-        href="#"
-        class="hidden rounded-full px-3.5 py-2 text-sm font-medium text-slate-400 transition-colors duration-150 hover:bg-white/7 hover:text-white no-underline sm:block"
-      >
-        Login
-      </a>
+    <div class="flex min-w-[6rem] justify-end">
       <a
         href={site.downloadUrl}
         class="rounded-full bg-[var(--color-accent)] px-5 py-2 text-sm font-semibold whitespace-nowrap text-white shadow-accent-glow transition-all duration-150 hover:opacity-90 active:scale-95 no-underline"

@@ -1,0 +1,171 @@
+---
+import { ArrowRight, Mic, Sparkles } from "@lucide/astro";
+import SectionHeading from "../SectionHeading.astro";
+
+const aiExamples = [
+  {
+    prompt: "Write an email to apply for leave tomorrow because I have a doctor appointment in the morning.",
+    output:
+      "Hi Sarah, I'd like to request leave for tomorrow because I have a doctor appointment in the morning. I'll wrap up urgent work today and stay reachable if anything comes up. Thanks for understanding.",
+    label: "Leave request",
+  },
+  {
+    prompt: "Reply politely and say I can join after 3 PM, and ask them to send the agenda before the call.",
+    output:
+      "Thanks for the invite. I can join after 3 PM. Please send the agenda beforehand so I can come prepared and review everything before the call.",
+    label: "Meeting reply",
+  },
+  {
+    prompt: "Turn this into a concise standup update: fixed the sync bug, reviewed the landing page, and shipping the hotkey settings today.",
+    output:
+      "Standup: fixed the sync bug, reviewed the landing page updates, and I’m shipping the hotkey settings later today after a final pass through QA.",
+    label: "Standup update",
+  },
+  {
+    prompt: "Draft a friendly follow-up message asking if they had a chance to review the proposal I sent last week.",
+    output:
+      "Hi Alex, just following up to see whether you've had a chance to review the proposal I sent last week. Happy to answer questions or adjust anything if that helps.",
+    label: "Follow-up note",
+  },
+] as const;
+---
+
+<section class="relative z-10 px-6 py-24" id="ai-agent">
+  <div class="mx-auto max-w-5xl">
+    <div class="grid grid-cols-1 items-center gap-14 lg:grid-cols-[0.95fr_1.05fr]">
+      <div class="reveal delay-2 lg:order-1">
+        <div class="glass relative overflow-hidden rounded-[28px] p-6 shadow-card">
+          <div class="pointer-events-none absolute left-[-4rem] top-[-3rem] h-40 w-40 rounded-full bg-[rgba(123,110,246,0.13)] blur-3xl"></div>
+          <div class="pointer-events-none absolute bottom-[-2rem] right-[-1rem] h-40 w-40 rounded-full bg-[rgba(79,142,247,0.12)] blur-3xl"></div>
+
+          <div
+            class="ai-example-card relative"
+            data-ai-examples={JSON.stringify(aiExamples)}
+          >
+            <div class="mb-4 flex items-center justify-between gap-4">
+              <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-accent)]">Example prompt</p>
+              <span class="ai-example-label rounded-full border border-white/8 bg-white/6 px-3 py-1 text-[11px] font-medium text-slate-300">
+                {aiExamples[0].label}
+              </span>
+            </div>
+
+            <div class="rounded-2xl border border-white/8 bg-[rgba(9,10,14,0.8)] p-5">
+              <p class="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">You say</p>
+              <p class="ai-example-prompt text-[15px] leading-relaxed text-slate-200">
+                "{aiExamples[0].prompt}"
+              </p>
+            </div>
+
+            <div class="my-4 flex justify-center">
+              <div class="flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(123,110,246,0.25)] bg-[rgba(123,110,246,0.12)] text-[var(--color-accent)] shadow-[0_0_24px_rgba(123,110,246,0.14)]">
+                <ArrowRight size={18} stroke-width={2} aria-hidden="true" />
+              </div>
+            </div>
+
+            <div class="rounded-2xl border border-white/8 bg-[linear-gradient(180deg,rgba(21,22,32,0.92),rgba(11,12,18,0.98))] p-5">
+              <p class="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Wave inserts</p>
+              <p class="ai-example-output text-[15px] leading-relaxed text-white">
+                {aiExamples[0].output}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:order-2">
+        <SectionHeading
+          eyebrow="AI Mode"
+          title="Say what you mean, not how to format it"
+          description="Wave can turn natural-language instructions into polished text. Speak the intent and let AI handle structure, cleanup, and tone."
+          maxWidthClass="max-w-none"
+        />
+
+        <div class="mt-8 space-y-4">
+          <div class="reveal delay-2 flex gap-3 rounded-2xl border border-white/8 bg-white/4 p-4">
+            <div class="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[color:rgba(123,110,246,0.15)] text-[var(--color-accent)]">
+              <Mic size={18} aria-hidden="true" />
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-white">Natural instructions in</p>
+              <p class="mt-1 text-sm leading-relaxed text-slate-400">Speak in plain language instead of dictating every final word exactly as it should appear.</p>
+            </div>
+          </div>
+
+          <div class="reveal delay-3 flex gap-3 rounded-2xl border border-white/8 bg-white/4 p-4">
+            <div class="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[color:rgba(79,142,247,0.15)] text-[var(--color-accent-2)]">
+              <Sparkles size={18} aria-hidden="true" />
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-white">Finished text out</p>
+              <p class="mt-1 text-sm leading-relaxed text-slate-400">Wave rewrites your spoken intent into cleaner text that is ready to insert at the cursor.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const cards = document.querySelectorAll(".ai-example-card");
+
+  cards.forEach((card) => {
+    const raw = card.getAttribute("data-ai-examples");
+    if (!raw) return;
+
+    const examples = JSON.parse(raw);
+    if (!Array.isArray(examples) || examples.length === 0) return;
+
+    const prompt = card.querySelector(".ai-example-prompt");
+    const output = card.querySelector(".ai-example-output");
+    const label = card.querySelector(".ai-example-label");
+
+    let index = Math.floor(Math.random() * examples.length);
+
+    const measureHeight = (items, formatter, target) => {
+      if (!(target instanceof HTMLElement)) return;
+
+      const probe = document.createElement("p");
+      const styles = window.getComputedStyle(target);
+      probe.style.position = "absolute";
+      probe.style.visibility = "hidden";
+      probe.style.pointerEvents = "none";
+      probe.style.left = "-9999px";
+      probe.style.top = "0";
+      probe.style.width = `${target.clientWidth}px`;
+      probe.style.font = styles.font;
+      probe.style.fontSize = styles.fontSize;
+      probe.style.fontWeight = styles.fontWeight;
+      probe.style.lineHeight = styles.lineHeight;
+      probe.style.letterSpacing = styles.letterSpacing;
+      probe.style.whiteSpace = "normal";
+      probe.style.textWrap = "pretty";
+      document.body.appendChild(probe);
+
+      let maxHeight = 0;
+      items.forEach((item) => {
+        probe.textContent = formatter(item);
+        maxHeight = Math.max(maxHeight, Math.ceil(probe.getBoundingClientRect().height));
+      });
+
+      document.body.removeChild(probe);
+      target.style.minHeight = `${maxHeight}px`;
+    };
+
+    const render = () => {
+      const item = examples[index];
+      if (prompt) prompt.textContent = `"${item.prompt}"`;
+      if (output) output.textContent = item.output;
+      if (label) label.textContent = item.label;
+    };
+
+    render();
+    measureHeight(examples, (item) => `"${item.prompt}"`, prompt);
+    measureHeight(examples, (item) => item.output, output);
+
+    window.setInterval(() => {
+      index = (index + 1) % examples.length;
+      render();
+    }, 3200);
+  });
+</script>

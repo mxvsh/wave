@@ -1,11 +1,12 @@
 ---
+import { Clock3, FileText, Lock, Mic, SendHorizontal, WandSparkles, WifiOff, Zap } from "@lucide/astro";
 import SectionHeading from "../SectionHeading.astro";
 
 const features = [
   {
     title: "One-key activation",
     description:
-      "Hold Right Option in any app and start speaking. Release to stop. That's the entire interface.",
+      "Hold Right Option, speak, and release. That is the entire interaction.",
     color: "bg-[color:rgba(123,110,246,0.15)]",
     iconColor: "#7B6EF6",
     delay: "",
@@ -14,25 +15,25 @@ const features = [
   {
     title: "Completely private",
     description:
-      "Whisper runs fully on-device. Your voice never leaves your Mac, with no cloud, servers, or data collection.",
+      "Whisper runs on-device, so your voice stays local with no cloud processing.",
     color: "bg-[color:rgba(52,211,153,0.15)]",
     iconColor: "#34D399",
     delay: "delay-1",
     icon: "lock",
   },
   {
-    title: "Streams to your cursor",
+    title: "AI writes from intent",
     description:
-      "Text appears directly where your cursor is with no clipboard hop or manual paste step.",
+      "Speak the intent and Wave turns it into polished text ready to send.",
     color: "bg-[color:rgba(79,142,247,0.15)]",
     iconColor: "#4F8EF7",
     delay: "delay-2",
-    icon: "document",
+    icon: "wand",
   },
   {
     title: "Groq for speed",
     description:
-      "Switch to Groq for ultra-fast real-time transcription when you need near-zero latency.",
+      "Switch to Groq for faster transcription when you want minimal latency.",
     color: "bg-[color:rgba(251,146,60,0.15)]",
     iconColor: "#FB923C",
     delay: "delay-1",
@@ -41,20 +42,20 @@ const features = [
   {
     title: "Works offline",
     description:
-      "No Wi-Fi? No problem. Whisper runs locally and stays usable on planes, in basements, or anywhere else.",
+      "No Wi-Fi needed. Whisper runs locally, so dictation still works offline.",
     color: "bg-[color:rgba(45,212,191,0.15)]",
     iconColor: "#2DD4BF",
     delay: "delay-2",
     icon: "wifi",
   },
   {
-    title: "Zero friction",
+    title: "Streams to your cursor",
     description:
-      "No accounts, no sign-ups, no onboarding. Download, run, and dictate.",
+      "Wave inserts text at your cursor directly, with no extra paste step.",
     color: "bg-[color:rgba(236,72,153,0.15)]",
     iconColor: "#EC4899",
     delay: "delay-3",
-    icon: "clock",
+    icon: "send",
   },
 ] as const;
 ---
@@ -76,24 +77,12 @@ const features = [
           ]}
         >
           <div class:list={["mb-5 flex h-11 w-11 items-center justify-center rounded-xl", feature.color]}>
-            {feature.icon === "mic" && (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={feature.iconColor} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
-            )}
-            {feature.icon === "lock" && (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={feature.iconColor} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            )}
-            {feature.icon === "document" && (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={feature.iconColor} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="13 2 13 9 20 9"></polyline><path d="M20 14v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l7 7z"></path><line x1="9" y1="15" x2="15" y2="15"></line><line x1="9" y1="19" x2="15" y2="19"></line></svg>
-            )}
-            {feature.icon === "bolt" && (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={feature.iconColor} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-            )}
-            {feature.icon === "wifi" && (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={feature.iconColor} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path><path d="M10.71 5.05A16 16 0 0 1 22.56 9"></path><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
-            )}
-            {feature.icon === "clock" && (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={feature.iconColor} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-            )}
+            {feature.icon === "mic" && <Mic size={20} color={feature.iconColor} aria-hidden="true" />}
+            {feature.icon === "lock" && <Lock size={20} color={feature.iconColor} aria-hidden="true" />}
+            {feature.icon === "wand" && <WandSparkles size={20} color={feature.iconColor} aria-hidden="true" />}
+            {feature.icon === "bolt" && <Zap size={20} color={feature.iconColor} aria-hidden="true" />}
+            {feature.icon === "wifi" && <WifiOff size={20} color={feature.iconColor} aria-hidden="true" />}
+            {feature.icon === "send" && <SendHorizontal size={20} color={feature.iconColor} aria-hidden="true" />}
           </div>
           <h3 class="mb-2 text-[15px] font-semibold">{feature.title}</h3>
           <p class="text-[14px] leading-relaxed text-slate-400">{feature.description}</p>
