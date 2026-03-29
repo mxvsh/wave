@@ -13,8 +13,6 @@ struct HomePageView: View {
             }
             .padding(16)
 
-            Divider()
-
             // Recent transcriptions
             if appState.historyManager.records.isEmpty {
                 Spacer()

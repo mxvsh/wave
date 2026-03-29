@@ -35,11 +35,9 @@ struct DictionaryEditorView: View {
                             .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 8))
                         }
                     }
-                    .padding(.horizontal, 16)
+                    .padding(16)
                 }
             }
-
-            Divider()
 
             HStack {
                 TextField("Add term\u{2026}", text: $newTerm)
@@ -53,7 +51,8 @@ struct DictionaryEditorView: View {
                     .buttonStyle(.plain)
                     .disabled(newTerm.trimmingCharacters(in: .whitespaces).isEmpty)
             }
-            .padding(16)
+            .padding(.horizontal, 16)
+            .padding(.bottom, 16)
         }
         .frame(maxHeight: .infinity)
     }

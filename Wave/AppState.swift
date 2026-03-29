@@ -68,6 +68,7 @@ final class AppState {
     let transcriptionService = TranscriptionService()
     let hotkeyService = HotkeyService()
     let historyManager = HistoryManager()
+    let microphoneManager = MicrophoneManager()
     var isModelLoaded = false   // tracked by @Observable — TranscriptionService is not
 
     var isReady: Bool {

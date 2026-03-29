@@ -59,6 +59,7 @@ struct HomeView: View {
             .frame(minWidth: 340)
         }
         .navigationTitle(selection?.rawValue ?? "Home")
+        .toolbarBackground(.hidden, for: .windowToolbar)
         .frame(minWidth: 520, maxWidth: 520, minHeight: 440, maxHeight: 440)
         .background(WindowConfigurator().frame(width: 0, height: 0))
         .sheet(isPresented: Binding(
