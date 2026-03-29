@@ -53,6 +53,19 @@ jobs:
             SWIFT_OPTIMIZATION_LEVEL=-Osize \
             SWIFT_COMPILATION_MODE=wholemodule
 
+      - name: Debug app size
+        run: |
+          echo "=== App bundle total ==="
+          du -sh build/Build/Products/Release/Wave.app
+          echo "=== Contents breakdown ==="
+          du -sh build/Build/Products/Release/Wave.app/Contents/*
+          echo "=== Frameworks ==="
+          du -sh build/Build/Products/Release/Wave.app/Contents/Frameworks/* 2>/dev/null || echo "No frameworks"
+          echo "=== Binary ==="
+          du -sh build/Build/Products/Release/Wave.app/Contents/MacOS/*
+          echo "=== Plugins/XPC ==="
+          du -sh build/Build/Products/Release/Wave.app/Contents/PlugIns/* 2>/dev/null || echo "No plugins"
+
       - name: Ad-hoc sign
         run: codesign --force --deep --sign - build/Build/Products/Release/Wave.app
 
