@@ -5,22 +5,25 @@ enum NavItem: String, Hashable {
     case home = "Home"
     case dictionary = "Dictionary"
     case snippets = "Snippets"
-    case help = "Help"
     // Settings group
     case general = "General"
     case shortcut = "Shortcut"
     case models = "Models"
+    // Help group
+    case howToUse = "How to Use"
+    case about = "About"
 
     @ViewBuilder
     var icon: some View {
         switch self {
-        case .home:       Ph.house.regular.frame(width: 16, height: 16)
+        case .home:      Ph.house.regular.frame(width: 16, height: 16)
         case .dictionary: Ph.bookOpen.regular.frame(width: 16, height: 16)
-        case .snippets:   Ph.textT.regular.frame(width: 16, height: 16)
-        case .help:       Ph.question.regular.frame(width: 16, height: 16)
-        case .general:    Ph.slidersHorizontal.regular.frame(width: 16, height: 16)
-        case .shortcut:   Ph.keyboard.regular.frame(width: 16, height: 16)
-        case .models:     Ph.cpu.regular.frame(width: 16, height: 16)
+        case .snippets:  Ph.textT.regular.frame(width: 16, height: 16)
+        case .general:   Ph.slidersHorizontal.regular.frame(width: 16, height: 16)
+        case .shortcut:  Ph.keyboard.regular.frame(width: 16, height: 16)
+        case .models:    Ph.cpu.regular.frame(width: 16, height: 16)
+        case .howToUse:  Ph.bookOpenText.regular.frame(width: 16, height: 16)
+        case .about:     Ph.info.regular.frame(width: 16, height: 16)
         }
     }
 }
@@ -35,33 +38,30 @@ struct HomeView: View {
                 Label(title: { Text("Home") }, icon: { NavItem.home.icon }).tag(NavItem.home)
                 Label(title: { Text("Dictionary") }, icon: { NavItem.dictionary.icon }).tag(NavItem.dictionary)
                 Label(title: { Text("Snippets") }, icon: { NavItem.snippets.icon }).tag(NavItem.snippets)
-                Label(title: { Text("Help") }, icon: { NavItem.help.icon }).tag(NavItem.help)
 
                 Section("Settings") {
                     Label(title: { Text("General") }, icon: { NavItem.general.icon }).tag(NavItem.general)
                     Label(title: { Text("Shortcut") }, icon: { NavItem.shortcut.icon }).tag(NavItem.shortcut)
                     Label(title: { Text("Models") }, icon: { NavItem.models.icon }).tag(NavItem.models)
                 }
+
+                Section("Help") {
+                    Label(title: { Text("How to Use") }, icon: { NavItem.howToUse.icon }).tag(NavItem.howToUse)
+                    Label(title: { Text("About") }, icon: { NavItem.about.icon }).tag(NavItem.about)
+                }
             }
             .navigationSplitViewColumnWidth(min: 140, ideal: 160, max: 200)
-            .safeAreaInset(edge: .bottom) {
-                Text("Wave \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "")")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-            }
         } detail: {
             Group {
                 switch selection ?? .home {
                 case .home:       HomePageView()
                 case .dictionary: DictionaryEditorView()
                 case .snippets:   SnippetsPageView()
-                case .help:       HelpPageView()
                 case .general:    GeneralSettingsView()
                 case .shortcut:   ShortcutSettingsView()
                 case .models:     ModelsSettingsView()
+                case .howToUse:   HowToUseView()
+                case .about:      AboutView()
                 }
             }
             .frame(minWidth: 340)

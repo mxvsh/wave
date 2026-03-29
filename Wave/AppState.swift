@@ -190,16 +190,16 @@ final class AppState {
             microphoneManager.applySelection(uid: selectedMicUID)
         }
 
-        // Default shortcut: Right Option
+        // Default shortcut: Fn
         if hotkeyKeyCode == 0 && hotkeyModifiers == 0 {
-            hotkeyKeyCode = 61 // kVK_RightOption
-            hotkeyModifiers = CGEventFlags.maskAlternate.rawValue
+            hotkeyKeyCode = 63 // kVK_Function
+            hotkeyModifiers = CGEventFlags.maskSecondaryFn.rawValue
         }
 
-        // Default AI shortcut: Right Command + Right Option
+        // Default AI shortcut: Right Option
         if aiModeKeyCode == 0 && aiModeModifiers == 0 {
-            aiModeKeyCode = 61 // kVK_RightOption (completing key)
-            aiModeModifiers = CGEventFlags([.maskCommand, .maskAlternate]).rawValue
+            aiModeKeyCode = 61 // kVK_RightOption
+            aiModeModifiers = CGEventFlags.maskAlternate.rawValue
         }
 
         if !isOnboardingComplete {
