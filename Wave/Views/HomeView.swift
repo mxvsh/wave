@@ -6,7 +6,7 @@ enum NavItem: String, Hashable {
     case snippets = "Snippets"
     // Settings group
     case general = "General"
-    case shortcut = "Shortcut"
+    case shortcut = "Shortcuts"
     case models = "Models"
     // Help group
     case howToUse = "How to Use"

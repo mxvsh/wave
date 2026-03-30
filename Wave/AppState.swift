@@ -454,7 +454,7 @@ final class AppState {
         if hideIdlePill {
             overlayPanel?.orderOut(nil)
         } else {
-            hideOverlayIfIdle()
+            overlayPanel?.updateStatus(.idle)
         }
     }
 
@@ -463,7 +463,6 @@ final class AppState {
     }
 
     func hideOverlay() {
-        // Return to idle pill — don't actually hide
         status = .idle
         hideOverlayIfIdle()
     }
@@ -473,6 +472,6 @@ final class AppState {
         if overlayPanel == nil {
             overlayPanel = OverlayPanel()
         }
-        hideOverlayIfIdle()
+        overlayPanel?.updateStatus(.idle)
     }
 }
