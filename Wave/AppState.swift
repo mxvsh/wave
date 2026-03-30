@@ -146,6 +146,7 @@ final class AppState {
 
     // MARK: - Overlay
     var overlayPanel: OverlayPanel?
+    var pendingNavSelection: NavItem? = nil
 
 
     // MARK: - Private

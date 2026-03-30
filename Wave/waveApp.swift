@@ -66,6 +66,7 @@ struct WaveApp: App {
             Divider()
 
             Button("Settings...") {
+                appState.pendingNavSelection = .general
                 openWindow(id: "main")
                 NSApp.activate(ignoringOtherApps: true)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {

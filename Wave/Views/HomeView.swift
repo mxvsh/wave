@@ -39,7 +39,7 @@ struct HomeView: View {
 
                 Section("Settings") {
                     Label("General", systemImage: NavItem.general.icon).tag(NavItem.general)
-                    Label("Shortcut", systemImage: NavItem.shortcut.icon).tag(NavItem.shortcut)
+                    Label("Shortcuts", systemImage: NavItem.shortcut.icon).tag(NavItem.shortcut)
                     Label("Models", systemImage: NavItem.models.icon).tag(NavItem.models)
                 }
 
@@ -83,6 +83,11 @@ struct HomeView: View {
         )) {
             OnboardingView()
                 .environment(appState)
+        }
+        .onChange(of: appState.pendingNavSelection) { _, pending in
+            guard let pending else { return }
+            selection = pending
+            appState.pendingNavSelection = nil
         }
     }
 }
