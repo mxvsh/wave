@@ -151,6 +151,7 @@ final class AppState {
 
     // MARK: - Private
     private var isKeyHeld = false
+    private var accessibilityWasGranted = false
 
     var shortcutDisplayString: String {
         KeyCodeMapping.displayString(
@@ -217,11 +218,30 @@ final class AppState {
             showOnboarding = true
         }
 
+        accessibilityWasGranted = PermissionService.isAccessibilityGranted()
+
         Task {
             await loadSelectedModel()
             if !groqAPIKey.isEmpty { await verifyAndFetchGroqModels() }
             setupHotkey()
             await MainActor.run { startPersistentOverlay() }
+        }
+
+        startAccessibilityMonitor()
+    }
+
+    private func startAccessibilityMonitor() {
+        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
+            guard let self else { timer.invalidate(); return }
+            let granted = PermissionService.isAccessibilityGranted()
+            if granted && !self.accessibilityWasGranted {
+                DispatchQueue.main.async {
+                    self.hotkeyService.stop()
+                    self.aiHotkeyService.stop()
+                    self.setupHotkey()
+                }
+            }
+            self.accessibilityWasGranted = granted
         }
     }
 
