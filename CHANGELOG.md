@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.3](https://github.com/mxvsh/wave/compare/v0.3.2...v0.3.3) (2026-03-30)
+
+### Bug Fixes
+
+* suppress clipboard history recording during paste ([1ace2d3](https://github.com/mxvsh/wave/commit/1ace2d33e5a8f9b6e986522a3a5ca5f043779d8a))
+
 ## [0.3.2](https://github.com/mxvsh/wave/compare/v0.3.1...v0.3.2) (2026-03-30)
 
 ### Features
