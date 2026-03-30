@@ -5,9 +5,9 @@ import Carbon.HIToolbox
 struct PasteService {
     static func paste(text: String) {
         // Try AX insertion first — works in native AppKit fields without touching clipboard
-        if pasteViaAX(text: text) { return }
+        if pasteViaAX(text) { return }
         // Fall back to clipboard + Cmd+V — works everywhere (Terminal, web, Electron, etc.)
-        pasteViaKeyboard(text: text)
+        pasteViaKeyboard(text)
     }
 
     @discardableResult

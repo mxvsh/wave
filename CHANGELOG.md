@@ -1,15 +1,5 @@
 # Changelog
 
-## [0.3.2](https://github.com/mxvsh/wave/compare/v0.3.1...v0.3.2) (2026-03-30)
-
-### Features
-
-* add clear history option with confirmation dialog ([6b25789](https://github.com/mxvsh/wave/commit/6b257891c80c479453436df13482cff0cd57517a))
-
-### Bug Fixes
-
-* use Cmd+V fallback for paste to support terminal and web apps ([1a18850](https://github.com/mxvsh/wave/commit/1a18850f9753ba4b7aea8432d367e017c865bc02))
-
 ## [0.3.1](https://github.com/mxvsh/wave/compare/v0.3.0...v0.3.1) (2026-03-30)
 
 ### Features
