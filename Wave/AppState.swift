@@ -219,6 +219,7 @@ final class AppState {
 
         Task {
             await loadSelectedModel()
+            if !groqAPIKey.isEmpty { await verifyAndFetchGroqModels() }
             setupHotkey()
             await MainActor.run { startPersistentOverlay() }
         }

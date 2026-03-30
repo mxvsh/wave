@@ -41,38 +41,6 @@ struct GeneralSettingsView: View {
                     .onAppear { appState.microphoneManager.refresh() }
                 }
 
-                // Groq
-                section("Groq") {
-                    Toggle("Use Groq API", isOn: Binding(
-                        get: { appState.transcriptionProvider == .groq },
-                        set: { appState.transcriptionProvider = $0 ? .groq : .local }
-                    ))
-                    .font(.system(size: 13))
-
-                    if appState.transcriptionProvider == .groq {
-                        HStack(spacing: 6) {
-                            TextField("API Key (gsk_...)", text: Binding(
-                                get: { appState.groqAPIKey },
-                                set: { appState.groqAPIKey = $0 }
-                            ))
-                            .textFieldStyle(.roundedBorder)
-                            .font(.system(size: 12, design: .monospaced))
-                            Button("Save") {
-                                Task { await appState.verifyAndFetchGroqModels() }
-                            }
-                            .font(.system(size: 12, weight: .semibold, design: .rounded))
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(Color.brand.opacity(0.15), in: RoundedRectangle(cornerRadius: 7))
-                            .foregroundStyle(Color.brand)
-                            .buttonStyle(.plain)
-                            .disabled(appState.groqAPIKey.isEmpty || appState.groqAPIStatus == .checking)
-                        }
-
-                        groqStatusView
-                    }
-                }
-
                 // Permissions
                 if !micGranted || !accessibilityGranted {
                     section("Permissions") {
@@ -107,37 +75,6 @@ struct GeneralSettingsView: View {
             accessibilityGranted = PermissionService.isAccessibilityGranted()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-    }
-
-    // MARK: - Groq status
-
-    @ViewBuilder
-    private var groqStatusView: some View {
-        switch appState.groqAPIStatus {
-        case .unknown:
-            EmptyView()
-        case .checking:
-            HStack(spacing: 5) {
-                ProgressView().scaleEffect(0.6).frame(width: 8, height: 8)
-                Text("Verifying...")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
-            }
-        case .operational:
-            HStack(spacing: 5) {
-                Circle().fill(.green).frame(width: 6, height: 6)
-                Text("Operational")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.green)
-            }
-        case .error(let msg):
-            HStack(spacing: 5) {
-                Circle().fill(.red).frame(width: 6, height: 6)
-                Text(msg)
-                    .font(.system(size: 11))
-                    .foregroundStyle(.red)
-            }
-        }
     }
 
     // MARK: - Language list
