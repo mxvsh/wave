@@ -33,7 +33,11 @@ struct PasteService {
         }
 
         pasteboard.clearContents()
-        pasteboard.setString(text, forType: .string)
+        // Write with ConcealedType so clipboard managers skip recording this transient write
+        let item = NSPasteboardItem()
+        item.setString(text, forType: .string)
+        item.setData(Data(), forType: NSPasteboard.PasteboardType("org.nspasteboard.ConcealedType"))
+        pasteboard.writeObjects([item])
 
         // Simulate Cmd+V
         let src = CGEventSource(stateID: .hidSystemState)
