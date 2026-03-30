@@ -1,5 +1,4 @@
-
-<img width="2560" height="1440" alt="wave-banner" src="https://github.com/user-attachments/assets/83c1bbfb-2c4d-4cfe-a351-a88875f06172" />
+<img width="100%" alt="banner" src="https://github.com/user-attachments/assets/02346b6f-a28f-4df4-b625-d44da35d9385" />
 
 ---
 
