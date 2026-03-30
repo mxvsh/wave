@@ -147,6 +147,7 @@ final class AppState {
     // MARK: - Overlay
     var overlayPanel: OverlayPanel?
 
+
     // MARK: - Private
     private var isKeyHeld = false
 
@@ -295,6 +296,27 @@ final class AppState {
         }
 
         aiHotkeyService.start()
+
+        overlayPanel?.setShortcutLabel(shortcutDisplayString)
+        setupPillPressAndHold()
+    }
+
+    func setupPillPressAndHold() {
+        overlayPanel?.onMouseDown = { [weak self] in
+            guard let self else { return }
+            self.isAIMode = false
+            if self.status == .idle {
+                self.isKeyHeld = true
+                Task { await self.startDictation() }
+            }
+        }
+        overlayPanel?.onMouseUp = { [weak self] in
+            guard let self else { return }
+            if self.isKeyHeld && self.status == .recording {
+                self.isKeyHeld = false
+                Task { await self.stopDictationAndPaste() }
+            }
+        }
     }
 
     func startDictation() async {
@@ -446,6 +468,8 @@ final class AppState {
     func showOverlay() {
         if overlayPanel == nil {
             overlayPanel = OverlayPanel()
+            overlayPanel?.setShortcutLabel(shortcutDisplayString)
+            setupPillPressAndHold()
         }
         overlayPanel?.updateStatus(status)
     }
@@ -471,6 +495,8 @@ final class AppState {
         guard !hideIdlePill else { return }
         if overlayPanel == nil {
             overlayPanel = OverlayPanel()
+            overlayPanel?.setShortcutLabel(shortcutDisplayString)
+            setupPillPressAndHold()
         }
         overlayPanel?.updateStatus(.idle)
     }
