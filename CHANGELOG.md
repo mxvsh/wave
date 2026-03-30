@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.3.1](https://github.com/mxvsh/wave/compare/v0.3.0...v0.3.1) (2026-03-30)
+
+### Features
+
+* add option to disable pill during idle state ([a0ade79](https://github.com/mxvsh/wave/commit/a0ade79aba93409e8c2a3c3640d63efa08776dea))
+* add pill hover tooltip and press-and-hold to speak ([cef8c77](https://github.com/mxvsh/wave/commit/cef8c77d54913d4fe7e6a2a4fef9f32d5784e6b9))
+* move groq section to models tab with masked key display ([d9e2e8b](https://github.com/mxvsh/wave/commit/d9e2e8b9ee3d7856c749acf02826bab53c4c53a0))
+* open general settings from menu bar and fix shortcuts label ([bd6baf5](https://github.com/mxvsh/wave/commit/bd6baf50b9ffb7a5cf884f8f5d8fa92bcba08f25))
+* selection mode ([54a78b6](https://github.com/mxvsh/wave/commit/54a78b69c15bb8f2c9d6bfca08b4d82225e059cf))
+
+### Bug Fixes
+
+* resolve infinite recursion crash in hideOverlayIfIdle ([57f4946](https://github.com/mxvsh/wave/commit/57f4946419d009cf3a240615ef77101638633f04))
+* use main run loop for event tap so hotkey works on first launch after update ([10ac898](https://github.com/mxvsh/wave/commit/10ac8989fc3b9805e91007c4625c36fc655ab0bb))
+
 ## [0.3.0](https://github.com/mxvsh/wave/compare/v0.2.12...v0.3.0) (2026-03-30)
 
 ### Features
