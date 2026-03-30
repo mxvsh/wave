@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+* restart hotkey service when accessibility permission is granted without requiring relaunch ([f29f84d](https://github.com/mxvsh/wave/commit/f29f84d))
 * resolve infinite recursion crash in hideOverlayIfIdle ([57f4946](https://github.com/mxvsh/wave/commit/57f4946419d009cf3a240615ef77101638633f04))
 * use main run loop for event tap so hotkey works on first launch after update ([10ac898](https://github.com/mxvsh/wave/commit/10ac8989fc3b9805e91007c4625c36fc655ab0bb))
 
