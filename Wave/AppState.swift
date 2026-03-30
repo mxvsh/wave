@@ -129,6 +129,7 @@ final class AppState {
     let microphoneManager = MicrophoneManager()
     var isModelLoaded = false   // tracked by @Observable — TranscriptionService is not
     var isAIMode = false
+    var selectedContext: String? = nil
 
     var isReady: Bool {
         switch transcriptionProvider {
@@ -259,6 +260,7 @@ final class AppState {
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 self.isAIMode = true
+                self.selectedContext = PasteService.getSelectedText()
                 switch self.dictationMode {
                 case .pushToTalk:
                     if self.status == .idle {
@@ -352,7 +354,11 @@ final class AppState {
                 let snippetLines = snippetManager.snippets.map { "- \($0.name): \($0.value)" }.joined(separator: "\n")
                 fullPrompt += "\n\nUser snippets (use when relevant):\n\(snippetLines)"
             }
-            let result = await transcriptionService.sendToAI(text: query, apiKey: groqAPIKey, model: aiModel, systemPrompt: fullPrompt)
+            var userMessage = query
+            if let context = selectedContext {
+                userMessage = "Selected text:\n\"\"\"\n\(context)\n\"\"\"\n\nInstruction: \(query)"
+            }
+            let result = await transcriptionService.sendToAI(text: userMessage, apiKey: groqAPIKey, model: aiModel, systemPrompt: fullPrompt)
             usagePromptTokens += result.promptTokens
             usageCompletionTokens += result.completionTokens
             usageTotalTokens += result.totalTokens
@@ -367,6 +373,7 @@ final class AppState {
         overlayPanel?.updateStatus(.idle)
         overlayPanel?.setAIMode(false)
         isAIMode = false
+        selectedContext = nil
 
         if let text = text, !text.isEmpty {
             print("[wave] pasting: '\(text)'")
