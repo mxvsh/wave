@@ -53,6 +53,18 @@ struct WaveApp: App {
                             Text(record.text.count > 40 ? String(record.text.prefix(40)) + "…" : record.text)
                         }
                     }
+                    Divider()
+                    Button("Clear History...") {
+                        let alert = NSAlert()
+                        alert.messageText = "Clear transcription history?"
+                        alert.informativeText = "This cannot be undone."
+                        alert.alertStyle = .warning
+                        alert.addButton(withTitle: "Clear")
+                        alert.addButton(withTitle: "Cancel")
+                        if alert.runModal() == .alertFirstButtonReturn {
+                            appState.historyManager.clearAll()
+                        }
+                    }
                 }
             }
 
