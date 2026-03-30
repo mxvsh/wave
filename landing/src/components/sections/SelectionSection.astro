@@ -1,0 +1,185 @@
+---
+import { Mic, Pencil, Sparkles, TextCursorInput } from "@lucide/astro";
+
+const examples = [
+  {
+    label: "Fix grammar",
+    instruction: "fix the grammar",
+    selected: "i recieved your email and will look at it soon hopefully",
+    output: "I received your email and will review it shortly.",
+  },
+  {
+    label: "Make shorter",
+    instruction: "make this shorter",
+    selected: "I wanted to reach out to you today to discuss the possibility of scheduling a meeting at some point in the near future to go over the project details.",
+    output: "I'd like to schedule a meeting to go over the project details.",
+  },
+  {
+    label: "Reply agreeing",
+    instruction: "reply agreeing",
+    selected: "Can we move the standup to 10 AM tomorrow?",
+    output: "Works for me, see you at 10 AM tomorrow.",
+  },
+  {
+    label: "More professional",
+    instruction: "make this more professional",
+    selected: "hey this looks good to me lgtm",
+    output: "This looks good — approved.",
+  },
+] as const;
+---
+
+<section class="relative z-10 px-6 py-24" id="selection">
+  <div class="mx-auto max-w-5xl">
+
+    <!-- Centered heading -->
+    <div class="mx-auto mb-14 max-w-xl text-center">
+      <p class="reveal mb-3 text-xs font-semibold uppercase tracking-[0.1em] text-[var(--color-accent)]">Selection Mode</p>
+      <h2 class="reveal delay-1 mb-4 text-[clamp(28px,4vw,44px)] font-bold leading-[1.15] tracking-[-0.025em]">Select. Speak. Replaced.</h2>
+      <p class="reveal delay-2 text-[17px] leading-relaxed text-slate-400">Highlight any text, hold the shortcut, and speak your instruction. Wave rewrites it in place.</p>
+    </div>
+
+    <!-- Showcase card -->
+    <div
+      class="reveal delay-2 sel-showcase relative overflow-hidden rounded-[28px] border border-white/8 shadow-[0_24px_64px_rgba(0,0,0,0.45)]"
+      data-examples={JSON.stringify(examples)}
+    >
+      <!-- Glows -->
+      <div class="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[rgba(79,142,247,0.08)] blur-3xl"></div>
+      <div class="pointer-events-none absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-[rgba(123,110,246,0.07)] blur-3xl"></div>
+
+      <!-- Tab bar -->
+      <div class="relative flex flex-wrap items-center gap-2 border-b border-white/6 bg-[rgba(10,11,16,0.9)] px-5 py-3.5">
+        <div class="mr-2 flex h-7 w-7 items-center justify-center rounded-lg bg-[rgba(79,142,247,0.15)]">
+          <Pencil size={13} color="#4f8ef7" aria-hidden="true" />
+        </div>
+        <span class="mr-auto text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-600">Selection Mode</span>
+        <div class="flex flex-wrap gap-1.5">
+          {examples.map((ex, i) => (
+            <button
+              class:list={["sel-tab rounded-full border px-3 py-1 text-[11px] font-medium transition-all duration-150 cursor-pointer", i === 0 ? "is-active" : ""]}
+              data-index={i}
+              type="button"
+            >
+              {ex.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <!-- Two-panel body -->
+      <div class="grid grid-cols-1 md:grid-cols-2">
+
+        <!-- Left: selected text + instruction -->
+        <div class="border-b border-white/5 bg-[rgba(9,10,14,0.92)] p-8 md:border-b-0 md:border-r">
+          <div class="mb-5 flex items-center gap-2.5">
+            <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-[rgba(79,142,247,0.14)]">
+              <TextCursorInput size={14} color="#4f8ef7" aria-hidden="true" />
+            </div>
+            <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">Selected text</p>
+          </div>
+
+          <!-- Selected text block -->
+          <p class="sel-selected min-h-[4.5rem] rounded-lg bg-[rgba(79,142,247,0.1)] px-3 py-2.5 text-[15px] leading-[1.75] text-slate-200 ring-1 ring-[rgba(79,142,247,0.2)]">
+            {examples[0].selected}
+          </p>
+
+          <!-- Voice instruction pill -->
+          <div class="mt-5 flex items-center gap-3">
+            <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[rgba(123,110,246,0.15)]">
+              <Mic size={13} color="#7b6ef6" aria-hidden="true" />
+            </div>
+            <p class="text-[13px] text-slate-500">You say &ldquo;<span class="sel-instruction font-medium text-slate-300">{examples[0].instruction}</span>&rdquo;</p>
+          </div>
+        </div>
+
+        <!-- Right: output -->
+        <div class="relative bg-[rgba(12,13,19,0.98)] p-8">
+          <div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(79,142,247,0.2)] to-transparent md:hidden"></div>
+          <div class="mb-5 flex items-center gap-2.5">
+            <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-[rgba(123,110,246,0.14)]">
+              <Sparkles size={14} color="#7b6ef6" aria-hidden="true" />
+            </div>
+            <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">Wave replaces with</p>
+          </div>
+          <p class="sel-output min-h-[4.5rem] text-[15px] leading-[1.75] text-white">
+            {examples[0].output}
+          </p>
+          <p class="mt-5 text-[12px] text-slate-600">Replaces selection in any app</p>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="flex items-center justify-center gap-6 border-t border-white/5 bg-[rgba(9,10,14,0.8)] px-6 py-3.5">
+        <span class="text-[12px] text-slate-600">Emails</span>
+        <span class="h-1 w-1 rounded-full bg-white/10"></span>
+        <span class="text-[12px] text-slate-600">Tweets</span>
+        <span class="h-1 w-1 rounded-full bg-white/10"></span>
+        <span class="text-[12px] text-slate-600">Slack messages</span>
+        <span class="h-1 w-1 rounded-full bg-white/10"></span>
+        <span class="text-[12px] text-slate-600">Code comments</span>
+        <span class="h-1 w-1 rounded-full bg-white/10"></span>
+        <span class="text-[12px] text-slate-600">Docs</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .sel-tab {
+    border-color: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(148, 163, 184, 1);
+  }
+  .sel-tab:hover:not(.is-active) {
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(226, 232, 240, 1);
+  }
+  .sel-tab.is-active {
+    border-color: rgba(79, 142, 247, 0.35);
+    background: rgba(79, 142, 247, 0.15);
+    color: #93c5fd;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".sel-showcase").forEach((showcase) => {
+    const raw = showcase.getAttribute("data-examples");
+    if (!raw) return;
+
+    const examples: { selected: string; instruction: string; output: string; label: string }[] = JSON.parse(raw);
+    if (!examples.length) return;
+
+    const selectedEl  = showcase.querySelector<HTMLElement>(".sel-selected");
+    const instructionEl = showcase.querySelector<HTMLElement>(".sel-instruction");
+    const outputEl    = showcase.querySelector<HTMLElement>(".sel-output");
+    const tabs        = showcase.querySelectorAll<HTMLElement>(".sel-tab");
+
+    let current = 0;
+
+    const render = (index: number) => {
+      const item = examples[index];
+      if (selectedEl)    selectedEl.textContent    = item.selected;
+      if (instructionEl) instructionEl.textContent = item.instruction;
+      if (outputEl)      outputEl.textContent      = item.output;
+      tabs.forEach((tab, i) => tab.classList.toggle("is-active", i === index));
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => {
+        current = i;
+        render(current);
+        clearInterval(timer);
+        timer = window.setInterval(advance, 4200);
+      });
+    });
+
+    const advance = () => {
+      current = (current + 1) % examples.length;
+      render(current);
+    };
+
+    let timer = window.setInterval(advance, 4200);
+  });
+</script>
