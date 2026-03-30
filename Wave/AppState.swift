@@ -51,6 +51,12 @@ final class AppState {
     var muteSystemAudio: Bool {
         didSet { UserDefaults.standard.set(muteSystemAudio, forKey: "muteSystemAudio") }
     }
+    var hideIdlePill: Bool {
+        didSet {
+            UserDefaults.standard.set(hideIdlePill, forKey: "hideIdlePill")
+            if hideIdlePill { overlayPanel?.orderOut(nil) } else { startPersistentOverlay() }
+        }
+    }
     var customVocabulary: [String] {
         didSet { UserDefaults.standard.set(customVocabulary, forKey: "customVocabulary") }
     }
@@ -169,6 +175,7 @@ final class AppState {
             includePunctuation = UserDefaults.standard.bool(forKey: "includePunctuation")
         }
         muteSystemAudio = UserDefaults.standard.bool(forKey: "muteSystemAudio")
+        hideIdlePill = UserDefaults.standard.bool(forKey: "hideIdlePill")
         customVocabulary = UserDefaults.standard.stringArray(forKey: "customVocabulary") ?? []
         transcriptionProvider = TranscriptionProvider(rawValue: UserDefaults.standard.string(forKey: "transcriptionProvider") ?? "") ?? .local
         groqAPIKey = UserDefaults.standard.string(forKey: "groqAPIKey") ?? ""
@@ -319,7 +326,7 @@ final class AppState {
             overlayPanel?.updateStatus(status)
             try? await Task.sleep(for: .seconds(2))
             status = .idle
-            overlayPanel?.updateStatus(.idle)
+            hideOverlayIfIdle()
             overlayPanel?.setAIMode(false)
             isAIMode = false
         }
@@ -370,10 +377,10 @@ final class AppState {
         }
 
         status = .idle
-        overlayPanel?.updateStatus(.idle)
         overlayPanel?.setAIMode(false)
         isAIMode = false
         selectedContext = nil
+        hideOverlayIfIdle()
 
         if let text = text, !text.isEmpty {
             print("[wave] pasting: '\(text)'")
@@ -443,6 +450,14 @@ final class AppState {
         overlayPanel?.updateStatus(status)
     }
 
+    func hideOverlayIfIdle() {
+        if hideIdlePill {
+            overlayPanel?.orderOut(nil)
+        } else {
+            hideOverlayIfIdle()
+        }
+    }
+
     func updateOverlay() {
         overlayPanel?.updateStatus(status)
     }
@@ -450,13 +465,14 @@ final class AppState {
     func hideOverlay() {
         // Return to idle pill — don't actually hide
         status = .idle
-        overlayPanel?.updateStatus(.idle)
+        hideOverlayIfIdle()
     }
 
     func startPersistentOverlay() {
+        guard !hideIdlePill else { return }
         if overlayPanel == nil {
             overlayPanel = OverlayPanel()
         }
-        overlayPanel?.updateStatus(.idle)
+        hideOverlayIfIdle()
     }
 }

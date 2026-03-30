@@ -16,6 +16,8 @@ struct GeneralSettingsView: View {
                         .font(.system(size: 13))
                     Toggle("Mute system audio while dictating", isOn: $state.muteSystemAudio)
                         .font(.system(size: 13))
+                    Toggle("Hide pill when idle", isOn: $state.hideIdlePill)
+                        .font(.system(size: 13))
                     Picker("Language", selection: $state.transcriptionLanguage) {
                         ForEach(Self.languages, id: \.code) { lang in
                             Text(lang.label).tag(lang.code)
