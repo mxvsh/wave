@@ -21,6 +21,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install signing certificate
+        env:
+          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          CERTIFICATE_PATH="$RUNNER_TEMP/build_certificate.p12"
+          KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
+          CERTIFICATE_BASE64_PATH="$RUNNER_TEMP/build_certificate.base64"
+
+          printf '%s' "$BUILD_CERTIFICATE_BASE64" > "$CERTIFICATE_BASE64_PATH"
+          base64 -D -i "$CERTIFICATE_BASE64_PATH" -o "$CERTIFICATE_PATH"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security import "$CERTIFICATE_PATH" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | tr -d '"')
+
       - name: Set version
         id: version
         run: |
@@ -36,17 +56,19 @@ jobs:
             echo "is_release=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Build
+      - name: Archive
         run: |
           xcodebuild \
             -project Wave.xcodeproj \
             -scheme Wave \
             -configuration Release \
+            -archivePath build/Wave.xcarchive \
             -derivedDataPath build \
+            archive \
             MARKETING_VERSION="${{ steps.version.outputs.marketing_version }}" \
             CURRENT_PROJECT_VERSION="${{ steps.version.outputs.marketing_version }}" \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="Developer ID Application" \
+            OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/app-signing.keychain-db" \
             STRIP_INSTALLED_PRODUCT=YES \
             DEAD_CODE_STRIPPING=YES \
             DEBUG_INFORMATION_FORMAT=dwarf-with-dsym \
@@ -54,26 +76,56 @@ jobs:
             SWIFT_COMPILATION_MODE=wholemodule \
             ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES=NO
 
+      - name: Export signed app
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          cat <<EOF > "$RUNNER_TEMP/ExportOptions.plist"
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>developer-id</string>
+            <key>signingStyle</key>
+            <string>automatic</string>
+            <key>signingCertificate</key>
+            <string>Developer ID Application</string>
+            <key>teamID</key>
+            <string>${APPLE_TEAM_ID}</string>
+          </dict>
+          </plist>
+          EOF
+
+          xcodebuild \
+            -exportArchive \
+            -archivePath build/Wave.xcarchive \
+            -exportPath build/export \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/app-signing.keychain-db"
+
       - name: Debug app size
         run: |
           echo "=== App bundle total ==="
-          du -sh build/Build/Products/Release/Wave.app
+          du -sh build/export/Wave.app
           echo "=== Contents breakdown ==="
-          du -sh build/Build/Products/Release/Wave.app/Contents/*
+          du -sh build/export/Wave.app/Contents/*
           echo "=== Frameworks ==="
-          du -sh build/Build/Products/Release/Wave.app/Contents/Frameworks/* 2>/dev/null || echo "No frameworks"
+          du -sh build/export/Wave.app/Contents/Frameworks/* 2>/dev/null || echo "No frameworks"
           echo "=== Binary ==="
-          du -sh build/Build/Products/Release/Wave.app/Contents/MacOS/*
+          du -sh build/export/Wave.app/Contents/MacOS/*
           echo "=== Plugins/XPC ==="
-          du -sh build/Build/Products/Release/Wave.app/Contents/PlugIns/* 2>/dev/null || echo "No plugins"
+          du -sh build/export/Wave.app/Contents/PlugIns/* 2>/dev/null || echo "No plugins"
           echo "=== Resources (top level) ==="
-          du -sh build/Build/Products/Release/Wave.app/Contents/Resources/* 2>/dev/null | sort -rh | head -20
+          du -sh build/export/Wave.app/Contents/Resources/* 2>/dev/null | sort -rh | head -20
 
-      - name: Ad-hoc sign
-        run: codesign --force --deep --sign - build/Build/Products/Release/Wave.app
+      - name: Verify signed app
+        run: |
+          codesign --verify --deep --strict --verbose=2 build/export/Wave.app
+          spctl -a -vvv -t execute build/export/Wave.app
 
       - name: Upload app
-        run: ditto -c -k --sequesterRsrc --keepParent build/Build/Products/Release/Wave.app Wave.app.zip
+        run: ditto -c -k --sequesterRsrc --keepParent build/export/Wave.app Wave.app.zip
 
       - name: Upload app artifact
         uses: actions/upload-artifact@v4
@@ -97,6 +149,26 @@ jobs:
       - name: Extract app
         run: ditto -x -k Wave.app.zip .
 
+      - name: Install signing certificate
+        env:
+          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          CERTIFICATE_PATH="$RUNNER_TEMP/build_certificate.p12"
+          KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
+          CERTIFICATE_BASE64_PATH="$RUNNER_TEMP/build_certificate.base64"
+
+          printf '%s' "$BUILD_CERTIFICATE_BASE64" > "$CERTIFICATE_BASE64_PATH"
+          base64 -D -i "$CERTIFICATE_BASE64_PATH" -o "$CERTIFICATE_PATH"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security import "$CERTIFICATE_PATH" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | tr -d '"')
+
       - name: Install create-dmg
         run: brew install create-dmg
 
@@ -117,6 +189,35 @@ jobs:
             --app-drop-link 460 170 \
             "$DMG_NAME" \
             Wave.app/
+
+      - name: Sign DMG
+        run: |
+          DMG_NAME="${{ steps.dmg.outputs.dmg_name }}"
+          codesign --force --sign "Developer ID Application" --keychain "$RUNNER_TEMP/app-signing.keychain-db" "$DMG_NAME"
+          codesign --verify --verbose=2 "$DMG_NAME"
+
+      - name: Notarize and staple DMG
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          DMG_NAME="${{ steps.dmg.outputs.dmg_name }}"
+          KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
+
+          xcrun notarytool store-credentials wave-notary \
+            --apple-id "$APPLE_ID" \
+            --team-id "$APPLE_TEAM_ID" \
+            --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+            --keychain "$KEYCHAIN_PATH"
+
+          xcrun notarytool submit "$DMG_NAME" \
+            --keychain-profile wave-notary \
+            --keychain "$KEYCHAIN_PATH" \
+            --wait
+
+          xcrun stapler staple "$DMG_NAME"
+          spctl -a -t open --context context:primary-signature -vv "$DMG_NAME"
 
       - name: Upload DMG
         uses: actions/upload-artifact@v4

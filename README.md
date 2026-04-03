@@ -32,14 +32,7 @@ Both shortcuts are fully customizable in Settings → Shortcut.
 
 Download the latest DMG from [Releases](https://github.com/mxvsh/wave/releases/latest).
 
-> **Note:** Wave is not code-signed. On first launch, macOS will block it. To open it:
-> 1. Right-click `Wave.app` → **Open**
-> 2. Click **Open** in the dialog
->
-> Alternatively, run in Terminal:
-> ```bash
-> xattr -dr com.apple.quarantine /Applications/Wave.app
-> ```
+Releases are distributed as signed, notarized DMGs.
 
 ## Build from source
 
@@ -52,6 +45,20 @@ open build/Build/Products/Release/Wave.app
 ```
 
 Or launch from Xcode — open `Wave.xcodeproj`, select the `Wave` scheme, and run.
+
+## Signed releases
+
+GitHub Actions builds signed and notarized release DMGs for tags matching `v*.*.*`.
+
+Required repository secrets:
+
+- `BUILD_CERTIFICATE_BASE64` — base64-encoded `Developer ID Application` `.p12`
+- `P12_PASSWORD` — password for the `.p12`
+- `KEYCHAIN_PASSWORD` — temporary CI keychain password
+- `APPLE_ID` — Apple ID email used for notarization
+- `APPLE_APP_SPECIFIC_PASSWORD` — app-specific password for notarization
+- `APPLE_TEAM_ID` — Apple Developer Team ID
+- `SPARKLE_PRIVATE_KEY` — Sparkle EdDSA private key for appcast generation
 
 ## Roadmap
 
