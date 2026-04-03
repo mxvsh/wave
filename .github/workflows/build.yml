@@ -57,6 +57,8 @@ jobs:
           fi
 
       - name: Archive
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           xcodebuild \
             -project Wave.xcodeproj \
@@ -67,6 +69,11 @@ jobs:
             archive \
             MARKETING_VERSION="${{ steps.version.outputs.marketing_version }}" \
             CURRENT_PROJECT_VERSION="${{ steps.version.outputs.marketing_version }}" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Developer ID Application" \
+            DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            PROVISIONING_PROFILE="" \
             STRIP_INSTALLED_PRODUCT=YES \
             DEAD_CODE_STRIPPING=YES \
             DEBUG_INFORMATION_FORMAT=dwarf-with-dsym \
@@ -99,7 +106,12 @@ jobs:
             -exportArchive \
             -archivePath build/Wave.xcarchive \
             -exportPath build/export \
-            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist"
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Developer ID Application" \
+            DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            PROVISIONING_PROFILE=""
 
       - name: Debug app size
         run: |
