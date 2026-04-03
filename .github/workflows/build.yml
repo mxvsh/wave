@@ -67,8 +67,6 @@ jobs:
             archive \
             MARKETING_VERSION="${{ steps.version.outputs.marketing_version }}" \
             CURRENT_PROJECT_VERSION="${{ steps.version.outputs.marketing_version }}" \
-            CODE_SIGN_IDENTITY="Developer ID Application" \
-            OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/app-signing.keychain-db" \
             STRIP_INSTALLED_PRODUCT=YES \
             DEAD_CODE_STRIPPING=YES \
             DEBUG_INFORMATION_FORMAT=dwarf-with-dsym \
@@ -101,8 +99,7 @@ jobs:
             -exportArchive \
             -archivePath build/Wave.xcarchive \
             -exportPath build/export \
-            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
-            OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/app-signing.keychain-db"
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist"
 
       - name: Debug app size
         run: |
@@ -193,7 +190,9 @@ jobs:
       - name: Sign DMG
         run: |
           DMG_NAME="${{ steps.dmg.outputs.dmg_name }}"
-          codesign --force --sign "Developer ID Application" --keychain "$RUNNER_TEMP/app-signing.keychain-db" "$DMG_NAME"
+          SIGNING_IDENTITY=$(security find-identity -v -p codesigning "$RUNNER_TEMP/app-signing.keychain-db" | awk -F '"' '/Developer ID Application/ { print $2; exit }')
+          test -n "$SIGNING_IDENTITY"
+          codesign --force --sign "$SIGNING_IDENTITY" --keychain "$RUNNER_TEMP/app-signing.keychain-db" "$DMG_NAME"
           codesign --verify --verbose=2 "$DMG_NAME"
 
       - name: Notarize and staple DMG
