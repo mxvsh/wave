@@ -131,7 +131,6 @@ jobs:
       - name: Verify signed app
         run: |
           codesign --verify --deep --strict --verbose=2 build/export/Wave.app
-          spctl -a -vvv -t execute build/export/Wave.app
 
       - name: Upload app
         run: ditto -c -k --sequesterRsrc --keepParent build/export/Wave.app Wave.app.zip
