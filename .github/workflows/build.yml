@@ -52,7 +52,8 @@ jobs:
           else
             SHORT_SHA="${GITHUB_SHA:0:7}"
             echo "tag=dev-${SHORT_SHA}" >> $GITHUB_OUTPUT
-            echo "marketing_version=$SHORT_SHA" >> $GITHUB_OUTPUT
+            MARKETING_VERSION=$(sed -n 's/.*"version": "\(.*\)".*/\1/p' package.json | head -n 1)
+            echo "marketing_version=${MARKETING_VERSION:-0.0.0}" >> $GITHUB_OUTPUT
             echo "is_release=false" >> $GITHUB_OUTPUT
           fi
 
@@ -68,7 +69,6 @@ jobs:
             -derivedDataPath build \
             archive \
             MARKETING_VERSION="${{ steps.version.outputs.marketing_version }}" \
-            CURRENT_PROJECT_VERSION="${{ steps.version.outputs.marketing_version }}" \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="Developer ID Application" \
             DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
