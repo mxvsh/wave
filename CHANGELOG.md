@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.7](https://github.com/mxvsh/wave/compare/v0.3.6...v0.3.7) (2026-04-04)
+
+### Bug Fixes
+
+* always use Cmd+V for paste to work in terminal and all apps ([421f754](https://github.com/mxvsh/wave/commit/421f754cc472074c5a03e5e24fecf85d25c4e216))
+
 ## [0.3.3](https://github.com/mxvsh/wave/compare/v0.3.2...v0.3.3) (2026-03-30)
 
 ### Bug Fixes
