@@ -1,7 +1,7 @@
 import Foundation
 import AppKit
 
-#if canImport(Sparkle)
+#if canImport(Sparkle) && !APP_STORE
 import Sparkle
 #endif
 
@@ -9,7 +9,7 @@ import Sparkle
 final class UpdaterService: NSObject {
     static let shared = UpdaterService()
 
-#if canImport(Sparkle)
+#if canImport(Sparkle) && !APP_STORE
     private lazy var updaterController = SPUStandardUpdaterController(
         startingUpdater: true,
         updaterDelegate: nil,
@@ -22,7 +22,7 @@ final class UpdaterService: NSObject {
     }
 
     var isAvailable: Bool {
-#if canImport(Sparkle)
+#if canImport(Sparkle) && !APP_STORE
         return true
 #else
         return false
@@ -30,13 +30,13 @@ final class UpdaterService: NSObject {
     }
 
     func start() {
-#if canImport(Sparkle)
+#if canImport(Sparkle) && !APP_STORE
         _ = updaterController
 #endif
     }
 
     func checkForUpdates() {
-#if canImport(Sparkle)
+#if canImport(Sparkle) && !APP_STORE
         updaterController.checkForUpdates(nil)
 #else
         NSSound.beep()

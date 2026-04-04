@@ -8,7 +8,7 @@
     "release": false
   },
   "hooks": {
-    "before:git:release": "xcrun agvtool new-marketing-version ${version} && xcrun agvtool new-version -all ${version} && git add Wave.xcodeproj/project.pbxproj Wave/Info.plist CHANGELOG.md"
+    "before:git:release": "xcrun agvtool new-marketing-version ${version} && xcrun agvtool next-version -all && git add package.json Wave.xcodeproj/project.pbxproj Config/Info.plist CHANGELOG.md"
   },
   "plugins": {
     "@release-it/conventional-changelog": {
