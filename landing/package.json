@@ -14,10 +14,11 @@
     "deploy": "bun run build && wrangler deploy"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^13.1.7",
     "@astrojs/sitemap": "^3.7.2",
     "@lucide/astro": "^1.7.0",
     "astro": "^6.1.1",
-    "wrangler": "^4.78.0"
+    "wrangler": "^4.80.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.2",
