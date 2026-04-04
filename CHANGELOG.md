@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.3.8](https://github.com/mxvsh/wave/compare/v0.3.7...v0.3.8) (2026-04-04)
+
 ## [0.3.7](https://github.com/mxvsh/wave/compare/v0.3.6...v0.3.7) (2026-04-04)
 
 ### Bug Fixes
