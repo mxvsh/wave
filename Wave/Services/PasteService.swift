@@ -4,20 +4,7 @@ import Carbon.HIToolbox
 
 struct PasteService {
     static func paste(text: String) {
-        // Try AX insertion first — works in native AppKit fields without touching clipboard
-        if pasteViaAX(text) { return }
-        // Fall back to clipboard + Cmd+V — works everywhere (Terminal, web, Electron, etc.)
         pasteViaKeyboard(text)
-    }
-
-    @discardableResult
-    private static func pasteViaAX(_ text: String) -> Bool {
-        let systemWide = AXUIElementCreateSystemWide()
-        var focusedElement: CFTypeRef?
-        guard AXUIElementCopyAttributeValue(systemWide, kAXFocusedUIElementAttribute as CFString, &focusedElement) == .success,
-              let element = focusedElement else { return false }
-        let result = AXUIElementSetAttributeValue(element as! AXUIElement, kAXSelectedTextAttribute as CFString, text as CFString)
-        return result == .success
     }
 
     private static func pasteViaKeyboard(_ text: String) {
